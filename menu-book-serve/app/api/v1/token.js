@@ -10,10 +10,10 @@ const { Auth } = require('../../../middleWares/auth')
 const { WXManager } = require('../services/wx')
 
 const router = new Router({
-  prefix: '/v1/token'
+  prefix: '/v1'
 })
 
-router.post('/', async (ctx, next) => {
+router.post('/token', async (ctx, next) => {
   // const token = jwt.sign({ foo: 'bar' }, 'shhhhh')
   const v = await new TokenValidator().validate(ctx)
   // 业务逻辑写在哪？ 业务分层 model server
@@ -38,7 +38,29 @@ router.post('/', async (ctx, next) => {
   // 生成token
   console.log(token)
   ctx.body = {
-    token
+    code: 20000,
+    data: {
+      token
+    },
+    message: '登录成功',
+  }
+  // new Success("获取token成功")
+
+})
+
+router.get('/userInfo', async (ctx, next) => {
+  // const token = jwt.sign({ foo: 'bar' }, 'shhhhh')
+  // 业务逻辑写在哪？ 业务分层 model server
+  // 接口方法中api中
+  // model中
+  // servre
+
+  ctx.body = {
+    code: 20000,
+    data: {
+      roles: "admin", name: '小王', avatar: 'dfdfd', introduction: "dfdfdf"
+    },
+    message: '获取用户信息成功',
   }
   // new Success("获取token成功")
 

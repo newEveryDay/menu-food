@@ -18,6 +18,7 @@ class Auth {
       }
       try {
         var decode = jwt.verify(userToken, secrety.secretyKey)
+        console.log(decode)
       } catch (error) {
         if (error.name === "TokenExpiredError") {
           throw new Forbbiden("tooken已过期")

@@ -170,7 +170,62 @@ export const asyncRoutes = [
       }
     ]
   },
-
+  {
+    path: '/',
+    component: Layout,
+    name: 'goodType',
+    redirect: '/goodType/addGoodsType',
+    meta: {
+      title: '商品类型',
+      icon: 'dashboard'
+    },
+    children: [
+      {
+        path: '/goodType/addGoodsType',
+        name: 'addGoodsType',
+        component: () => import('@/views/good-type/addGoodsType'),
+        meta: {
+          title: '商品分类', icon: 'dashboard', roles: ['editor']
+        }
+      },
+      {
+        path: '/goodType/goodsTypeList',
+        name: 'goodsTypeList',
+        component: () => import('@/views/good-type/goodsTypeList'),
+        meta: {
+          title: '分类列表', icon: 'dashboard', roles: ['admin']
+        }
+      }
+    ]
+  },
+  {
+    path: '/good',
+    component: Layout,
+    name: 'good',
+    redirect: '/good/addGood',
+    meta: {
+      title: '商品信息',
+      icon: 'dashboard'
+    },
+    children: [
+      {
+        path: '/goods/addGood',
+        name: 'addGood',
+        component: () => import('@/views/goods/addGoods'),
+        meta: {
+          title: '添加商品', icon: 'dashboard', roles: ['admin']
+        }
+      },
+      {
+        path: '/goods/goodsList',
+        name: 'goodsList',
+        component: () => import('@/views/goods/goodsList'),
+        meta: {
+          title: '商品列表', icon: 'dashboard', roles: ['admin']
+        }
+      }
+    ]
+  },
   {
     path: '/icon',
     component: Layout,
