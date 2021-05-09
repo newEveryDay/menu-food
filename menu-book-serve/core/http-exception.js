@@ -27,11 +27,16 @@ class ParameterException extends HttpException {
 }
 // 成功提示
 class Success extends HttpException {
-  constructor(msg = "oK", errorCode = "0") {
+  constructor(msg = "oK", data, errorCode = '0') {
     super()
     this.code = 200
     this.msg = msg
-    this.errorCode = errorCode
+    if (data) {
+      this.data = data
+    }
+    if (errorCode) {
+      this.errorCode = errorCode
+    }
   }
 }
 // 当查询结果在数据库中找不到

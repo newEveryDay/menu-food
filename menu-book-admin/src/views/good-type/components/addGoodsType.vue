@@ -12,11 +12,11 @@
     <el-card class="box-card">
       <el-form ref="form" :model="form" label-width="100px">
         <el-form-item label="分类名称">
-          <el-input v-model="form.name"></el-input>
+          <el-input v-model="form.name" />
         </el-form-item>
 
         <el-form-item label="售货机描述">
-          <el-input type="textarea" v-model="form.description"></el-input>
+          <el-input v-model="form.description" type="textarea" />
         </el-form-item>
 
         <!--        <el-form-item>-->
@@ -28,10 +28,20 @@
   </div>
 </template>
 <script>
-import { postCategory } from '@/service/goods'
+import { postCategory } from '@/api/goods'
 
 export default {
-  data() {
+  props: {
+    // 基础类型检测, null意味着任何类型都行
+    listRowData: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
+    // 多种类型
+  },
+  data () {
     return {
       form: {
         vems_id: '',
@@ -41,29 +51,19 @@ export default {
       vemsList: []
     }
   },
-  props: {
-    // 基础类型检测, null意味着任何类型都行
-    listRowData: {
-      type: Object,
-      default() {
-        return {}
-      }
-    }
-    // 多种类型
-  },
-  created() {
-  },
-  mounted() {
-    this.form = this.listRowData
-    //   this.form.vems_id=this.listRowData.vems_id[0]._id
-  },
   watch: {
-    listRowData(newVal) {
+    listRowData (newVal) {
       this.form = newVal
     }
   },
+  created () {
+  },
+  mounted () {
+    this.form = this.listRowData
+    //   this.form.vems_id=this.listRowData.vems_id[0]._id
+  },
   methods: {
-    onSubmit() {
+    onSubmit () {
       postCategory(this.form).then(res => {
         console.log(res)
         this.$message({
@@ -72,49 +72,48 @@ export default {
         })
       })
     },
-    back() {
+    back () {
     }
   }
 }
 </script>
 <style lang="scss">
-  .content {
-
-    .text {
-      font-size: 14px;
-    }
-
-    .item {
-      margin-bottom: 18px;
-    }
-
-    .clearfix:before,
-    .clearfix:after {
-      display: table;
-      content: "";
-    }
-
-    .clearfix:after {
-      clear: both;
-    }
-
-    .el-card__body {
-      padding: 10px;
-    }
-
-    .box-card {
-      width: 100%;
-    }
-
-    .box-card-title {
-      border-left: 4px solid #fc5721;
-      /*height: 40px;*/
-      /*line-height: 40px;*/
-      padding-left: 10px;
-    }
-
-    .el-bt {
-      float: right;
-    }
+.content {
+  .text {
+    font-size: 14px;
   }
+
+  .item {
+    margin-bottom: 18px;
+  }
+
+  .clearfix:before,
+  .clearfix:after {
+    display: table;
+    content: '';
+  }
+
+  .clearfix:after {
+    clear: both;
+  }
+
+  .el-card__body {
+    padding: 10px;
+  }
+
+  .box-card {
+    width: 100%;
+  }
+
+  .box-card-title {
+    border-left: 4px solid #fc5721;
+    /*height: 40px;*/
+    /*line-height: 40px;*/
+    padding-left: 10px;
+  }
+
+  .el-bt {
+    float: right;
+  }
+}
 </style>

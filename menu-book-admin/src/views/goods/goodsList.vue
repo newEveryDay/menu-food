@@ -1,31 +1,45 @@
 <template>
   <div>
-    <zyp-card :lable="'商品列表'" :isShowBt="false"></zyp-card>
-    <div class="el-elem-field el-container-box">
+    <div class="el-elem-field">
+      <div class="el-breadcrumbs">
+        <span>课程分类</span>
+        <router-link class="el-bt" :to="'addInformation'">
+          <el-button type="primary" icon="el-icon-plus">添加</el-button>
+        </router-link>
+      </div>
+
+      <div class="el-field-box">
+        <el-form label-width="80px" :model="formLabelAlign">
+          <el-row :gutter="0">
+            <el-col :span="6">
+              <el-form-item label="ID">
+                <el-input v-model="formLabelAlign.name" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="标题">
+                <el-input v-model="formLabelAlign.name" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
+    </div>
+
+    <div class="el-elem-field">
       <el-container>
         <div class="el-elem-warp">
-          <el-table :data="goodList" border style="width: 100%">
-
-            <el-table-column fixed prop="mercName" label="商品名称"></el-table-column>
-            <el-table-column fixed label="商品图">
-              <template slot-scope="scope">
-                <img
-                  style="display:inline-block;height:80px"
-                  v-for="(item,index) in scope.row.imgList"
-                  :key="index"
-                  :src="baseUrl + item.url"
-                  alt
-                />
-              </template>
-            </el-table-column>
-
-            <el-table-column fixed prop="price" label="商品价格"></el-table-column>
-            <el-table-column fixed prop="stock" label="库存数量"></el-table-column>
-            <el-table-column fixed prop="description" label="商品描述"></el-table-column>
+          <el-table :data="articleLists" border style="width: 100%">
+            <el-table-column fixed prop="id" label="ID" width="180" />
+            <el-table-column prop="title" label="标题" />
+            <el-table-column prop="type" label="分类" width="120" />
+            <el-table-column prop="createTime" label="创建时间" width="240" />
+            <el-table-column prop="hit" label="点击量" width="120">></el-table-column>
+            <el-table-column prop="answer" label="评论数" width="120" />
             <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
-                <el-button type="text" size="small">查看</el-button>
-                <el-button @click="handleClick(scope.row)" type="text" size="small">编辑</el-button>
+                <el-button type="text" size="small" @click="handleClick(scope.row)">查看</el-button>
+                <el-button type="text" size="small" @click="bj">编辑</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -33,179 +47,133 @@
       </el-container>
       <div class="block pages">
         <el-pagination
-          @size-change="handleSizeChange"
           :background="true"
-          @current-change="handleCurrentChange"
-          :current-page="pagination.page"
-          :page-sizes="[2, 20, 50, 400]"
-          :page-size="pagination.size"
+          :current-page="currentPage4"
+          :page-sizes="[100, 200, 300, 400]"
+          :page-size="100"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="totalCount"
-        ></el-pagination>
+          :total="400"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
       </div>
     </div>
-    <el-dialog title="" ref="dialog" @open="open" :visible="dialogVisible" width="50%" :before-close="handleClose">
-      <!-- <span>这是一段信息</span> -->
-      <edit-goods :listRowData="rowData"/>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="confirm">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 <script>
-import { getGoods, putGoods } from '@/service/goods'
-import editGoods from './editGoods'
-import ZypCard from '@/components/ZypCard/ZypCard.vue'
+// import { articleList } from "@/api/arctcle";
 export default {
-  components: {
-    editGoods,
-    ZypCard
-  },
-  data() {
+  data () {
     return {
-      goodList: [],
-      baseUrl: 'http://localhost:3000',
-      pagination: {
-        page: 1,
-        size: 2
-      },
-      totalCount: 0,
       labelPosition: 'right',
-      currentPage: 1,
-      dialogVisible: false,
-      rowData: {}
+      formLabelAlign: {
+        name: '',
+        region: '',
+        type: '',
+        data1: '',
+        data2: ''
+      },
+      articleLists: [],
+      currentPage4: 4
     }
   },
-  created() {
-    this.getGoods()
+  created () {
+    // this.articleList()
   },
   methods: {
-    getGoods() {
-      const params = this.pagination
-      getGoods(params).then(res => {
-        const goodsList = res.data.data
-        this.totalCount = res.data.count
-        // for (let i = 0; i < goodsList.length; i++) {
-        //   for (let j = 0; j < goodsList[i].imgList.length; j++) {
-        //     goodsList[i].imgList[j].url =
-        //       this.baseUrl + goodsList[i].imgList[j].url
-        //   }
-        // }
-        this.goodList = goodsList
-      })
+    // articleList() {
+    //   return new Promise(async (resolve, reject) => {
+    //     try {
+    //       const response = await articleList()
+    //       const data = response.data
+    //       console.log(data)
+    //       this.articleLists = data
+    //       resolve();
+    //     } catch (error) {
+    //       reject(error)
+    //     }
+    //   })
+    // },
+    handleClick (row) {
+      console.log(row)
     },
-    handleClose(done) {
-      this.$confirm('确认关闭？')
-        .then(_ => {
-          done()
-        })
-        .catch(_ => {
-        })
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
     },
-    handleSizeChange(val) {
-      this.pagination.size = val
-      this.getGoods()
-    },
-    handleCurrentChange(val) {
-      this.pagination.page = val
-      this.getGoods()
+    handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
-    },
-    open(e) {
-      console.log(e)
-    },
-    handleClick(row) {
-      // console.log(row)
-      this.rowData = row
-      console.log(this.rowData)
-
-      setTimeout(() => {
-        this.dialogVisible = true
-      }, 100)
-    },
-    putGoods() {
-      putGoods(this.rowData).then(res => {
-        this.$message({
-          message: '修改商品成功',
-          type: 'success'
-        })
-      })
-    },
-    confirm() {
-      this.putGoods()
-      this.dialogVisible = false
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-  .el-elem-field {
-    background: #fff;
-    border: 0 none;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    display: block;
-    margin: 10px 20px 20px;
-    padding: 0 10px;
+.el-elem-field {
+  background: #fff;
+  border: 0 none;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  display: block;
+  margin: 10px 20px 20px;
+  padding: 0 10px;
 
-    .el-breadcrumbs {
-      border-bottom: 1px solid #ecf1f7;
-      height: 50px;
-      line-height: 50px;
+  .el-breadcrumbs {
+    border-bottom: 1px solid #ecf1f7;
+    height: 50px;
+    line-height: 50px;
 
-      span {
-        border-left: 4px solid #fc5721;
-        height: 18px;
-        line-height: 18px;
-        padding-left: 10px;
-      }
+    span {
+      border-left: 4px solid #fc5721;
+      height: 18px;
+      line-height: 18px;
+      padding-left: 10px;
     }
   }
+}
 
+.el-bt {
+  float: right;
+}
 
+.el-container {
+  padding: 10px 15px 35px;
+}
 
-  .el-container {
-    padding: 10px 15px 35px;
-  }
+.el-warp-list-box {
+  margin-bottom: 30px;
 
-  .el-warp-list-box {
-    margin-bottom: 30px;
-
-    .el-warp-list {
-      height: 48px;
-      line-height: 46px;
-      border-left: 3px solid #ff662f;
-      background: #f3f3f3;
-      padding: 0 5px;
-      cursor: pointer;
-      width: 100%;
-    }
-  }
-
-  .el-elem-warp {
+  .el-warp-list {
+    height: 48px;
+    line-height: 46px;
+    border-left: 3px solid #ff662f;
+    background: #f3f3f3;
+    padding: 0 5px;
+    cursor: pointer;
     width: 100%;
   }
+}
 
-  .el-warp-list-left {
-    float: left;
-    font-size: 16px;
-    color: #666;
-    margin-left: 20px;
+.el-elem-warp {
+  width: 100%;
+}
+
+.el-warp-list-left {
+  float: left;
+  font-size: 16px;
+  color: #666;
+  margin-left: 20px;
+}
+
+.el-warp-list-right {
+  float: right;
+
+  i {
+    margin-right: 20px;
   }
+}
 
-  .el-warp-list-right {
-    float: right;
-
-    i {
-      margin-right: 20px;
-    }
-  }
-
-  .el-field-box {
-    padding: 20px 0;
-  }
-
-  .el-container-box {
-  }
+.el-field-box {
+  padding: 20px 0;
+}
+.el-container-box {
+  padding: 40px 20px;
+}
 </style>

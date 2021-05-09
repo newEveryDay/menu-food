@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <zyp-card :lable="'编辑商品'" :isShowBt="false"></zyp-card>
+    <zyp-card :lable="'编辑商品'" :is-show-bt="false" />
     <el-card v-if="listRowData" class="box-card">
       <el-form ref="form" :model="form" label-width="100px">
         <el-form-item label="商品名称">
@@ -20,7 +20,7 @@
               :key="index"
               :label="vem.name"
               :value="vem.id"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="商品主图">
@@ -33,10 +33,10 @@
               :on-success="handleAvatarSuccess"
               :file-list="form.imgList"
             >
-              <i class="el-icon-plus"></i>
+              <i class="el-icon-plus" />
             </el-upload>
             <el-dialog :visible.sync="dialogVisible">
-              <img width="100%" :src="dialogImageUrl" alt/>
+              <img width="100%" :src="dialogImageUrl" alt>
             </el-dialog>
           </div>
         </el-form-item>
@@ -49,7 +49,7 @@
   </div>
 </template>
 <script>
-import { getCategory, putGoods } from '@/service/goods'
+import { getCategory, putGoods } from '@/api/goods'
 import ZypCard from '@/components/ZypCard/ZypCard.vue'
 // import addGoodsType from '../good-type/components/addGoodsType'
 export default {
@@ -61,13 +61,13 @@ export default {
     // 基础类型检测, null意味着任何类型都行
     listRowData: {
       type: Object,
-      default() {
+      default () {
         return {}
       }
     }
     // 多种类型
   },
-  data() {
+  data () {
     return {
       form: {
         id: '',
@@ -84,20 +84,20 @@ export default {
       dialogVisible: false
     }
   },
-  created() {
-    this.form = this.listRowData
-    this.getCategory()
-  },
-  mounted() {
-
-  },
   watch: {
-    listRowData(newValue) {
+    listRowData (newValue) {
       this.form = newValue
     }
   },
+  created () {
+    this.form = this.listRowData
+    this.getCategory()
+  },
+  mounted () {
+
+  },
   methods: {
-    getCategory() {
+    getCategory () {
       getCategory().then(res => {
         this.goodsTypeList = res.data
         console.log(this.goodsTypeList)
@@ -105,7 +105,7 @@ export default {
       })
     },
 
-    onSubmit() {
+    onSubmit () {
       putGoods(this.form).then(res => {
         this.$message({
           message: '修改商品成功',
@@ -114,15 +114,15 @@ export default {
       })
     },
 
-    handleRemove(file, fileList) {
+    handleRemove (file, fileList) {
       console.log(file, fileList)
       //   thumb_id
     },
-    handlePictureCardPreview(file) {
+    handlePictureCardPreview (file) {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
     },
-    handleAvatarSuccess(res, file) {
+    handleAvatarSuccess (res, file) {
       console.log(file)
       console.log('res' + JSON.stringify(res))
       // const imags = res.data
@@ -132,5 +132,4 @@ export default {
 }
 </script>
 <style lang="scss">
-
 </style>

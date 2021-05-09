@@ -3,6 +3,7 @@ const logger = require('koa-logger')
 const bodyparser = require('koa-bodyparser')
 const catchError = require('./middleWares/exception')
 const InitManager = require('./core/init')
+const static = require('koa-static')
 // 实例化koa
 const app = new Koa()
 app.use(logger())
@@ -16,6 +17,7 @@ app.use(logger())
 // 应用程序中间件
 app.use(catchError)
 app.use(bodyparser())
+app.use(static(__dirname, '/public'))
 InitManager.initCore(app)
 
 // 客户端兼容性 老旧版本

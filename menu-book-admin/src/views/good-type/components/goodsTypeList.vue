@@ -12,11 +12,11 @@
       <el-container>
         <div class="el-elem-warp">
           <el-table :data="goodsTypeList" border style="width: 100%">
-            <el-table-column fixed prop="name" label="售货机名称"></el-table-column>
+            <el-table-column fixed prop="name" label="售货机名称" />
             <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
                 <el-button type="text" size="small">查看</el-button>
-                <el-button @click="handleClick(scope.row)" type="text" size="small">编辑</el-button>
+                <el-button type="text" size="small" @click="handleClick(scope.row)">编辑</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -24,15 +24,15 @@
       </el-container>
       <div class="block pages">
         <el-pagination
-          @size-change="handleSizeChange"
           :background="true"
-          @current-change="handleCurrentChange"
           :current-page="currentPage4"
           :page-sizes="[10, 20, 50, 400]"
           :page-size="pagination.page_size"
           layout="total, sizes, prev, pager, next, jumper"
           :total="pagination.total_pages"
-        ></el-pagination>
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
       </div>
     </div>
 
@@ -46,10 +46,10 @@
   </div>
 </template>
 <script>
-import { getCategory } from '@/service/goods'
+import { getCategory } from '@/api/goods'
 
 export default {
-  data() {
+  data () {
     return {
       vems_id: '',
       goodsTypeList: [],
@@ -60,18 +60,18 @@ export default {
       dialogVisible: false
     }
   },
-  created() {
+  created () {
     this.getCategory()
   },
   methods: {
-    getCategory() {
+    getCategory () {
       getCategory().then(res => {
         console.log(res.data)
         this.goodsTypeList = res.data
         // this.pagination = res.pagination;
       })
     },
-    handleClose(done) {
+    handleClose (done) {
       this.$confirm('确认关闭？')
         .then(_ => {
           done()
@@ -79,85 +79,85 @@ export default {
         .catch(_ => {
         })
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
     },
-    handleClick(row) {
+    handleClick (row) {
       this.dialogVisible = true
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-  .el-elem-field {
-    background: #fff;
-    border: 0 none;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    display: block;
-    margin: 10px 20px 20px;
-    padding: 0 10px;
+.el-elem-field {
+  background: #fff;
+  border: 0 none;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  display: block;
+  margin: 10px 20px 20px;
+  padding: 0 10px;
 
-    .el-breadcrumbs {
-      border-bottom: 1px solid #ecf1f7;
-      height: 50px;
-      line-height: 50px;
+  .el-breadcrumbs {
+    border-bottom: 1px solid #ecf1f7;
+    height: 50px;
+    line-height: 50px;
 
-      span {
-        border-left: 4px solid #fc5721;
-        height: 18px;
-        line-height: 18px;
-        padding-left: 10px;
-      }
+    span {
+      border-left: 4px solid #fc5721;
+      height: 18px;
+      line-height: 18px;
+      padding-left: 10px;
     }
   }
+}
 
-  .el-bt {
-    float: right;
-  }
+.el-bt {
+  float: right;
+}
 
-  .el-container {
-    padding: 10px 15px 35px;
-  }
+.el-container {
+  padding: 10px 15px 35px;
+}
 
-  .el-warp-list-box {
-    margin-bottom: 30px;
+.el-warp-list-box {
+  margin-bottom: 30px;
 
-    .el-warp-list {
-      border-left: 3px solid #ff662f;
-      background: #f3f3f3;
-      padding: 0 5px;
-      cursor: pointer;
-      width: 100%;
-    }
-  }
-
-  .el-elem-warp {
+  .el-warp-list {
+    border-left: 3px solid #ff662f;
+    background: #f3f3f3;
+    padding: 0 5px;
+    cursor: pointer;
     width: 100%;
   }
+}
 
-  .el-warp-list-left {
-    float: left;
-    font-size: 16px;
-    color: #666;
-    margin-left: 20px;
+.el-elem-warp {
+  width: 100%;
+}
+
+.el-warp-list-left {
+  float: left;
+  font-size: 16px;
+  color: #666;
+  margin-left: 20px;
+}
+
+.el-warp-list-right {
+  float: right;
+
+  i {
+    margin-right: 20px;
   }
+}
 
-  .el-warp-list-right {
-    float: right;
+.el-field-box {
+  padding: 20px 0;
+}
 
-    i {
-      margin-right: 20px;
-    }
-  }
-
-  .el-field-box {
-    padding: 20px 0;
-  }
-
-  .el-container-box {
-    padding: 40px 20px;
-  }
+.el-container-box {
+  padding: 40px 20px;
+}
 </style>
