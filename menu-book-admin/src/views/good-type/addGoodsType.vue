@@ -10,8 +10,8 @@
   <div class="container">
     <div class="el-elem-field">
       <div class="el-breadcrumbs">
-        <span>课程分类</span>
-        <a href class="el-bt">
+        <span>菜谱分类</span>
+        <a class="el-bt" @click.prevent="dialogVisible=true">
           <el-button type="primary" icon="el-icon-plus">一级分类</el-button>
         </a>
       </div>
@@ -19,43 +19,7 @@
     <div class="el-elem-field">
       <el-container>
         <div class="el-elem-warp">
-          <!-- <ul>
-            <li class="el-warp-list-box">
-              <div class="el-warp-list">
-                <div class="el-warp-list-left">IT</div>
-                <div class="el-warp-list-right">
-                  <i class="el-icon-edit"></i>
-                  <i class="el-icon-delete"></i>
-                  <i class="el-icon-sort-down"></i>
-                  <i class="el-icon-sort-up"></i>
-                </div>
-              </div>
-            </li>
-            <li class="el-warp-list-box">
-              <div class="el-warp-list">
-                <div class="el-warp-list-left">热门</div>
-                <div class="el-warp-list-right">
-                  <i class="el-icon-edit"></i>
-                  <i class="el-icon-delete"></i>
-                  <i class="el-icon-sort-down"></i>
-                  <i class="el-icon-sort-up"></i>
-                </div>
-              </div>
-            </li>
-          </ul>-->
-
           <div class="custom-tree-container">
-            <!-- <div class="block">
-              <p>使用 render-content</p>
-              <el-tree
-                :data="data"
-                show-checkbox
-                node-key="id"
-                default-expand-all
-                :expand-on-click-node="false"
-                :render-content="renderContent"
-              ></el-tree>
-            </div>-->
             <div class="block">
               <el-tree
                 :data="data"
@@ -70,9 +34,7 @@
                     <i class="el-icon-delete" @click.stop="deleteCurent" />
                     <i class="el-icon-sort-down" @click.stop="downCurent" />
                     <i class="el-icon-sort-up" @click.stop="upCurent" />
-                    <el-button type="primary" icon="el-icon-plus" @click.stop="addChild">一级分类</el-button>
-                    <!-- <el-button type="text" size="mini" @click="() => append(data)">Append</el-button>
-                    <el-button type="text" size="mini" @click="() => remove(node, data)">Delete</el-button>-->
+                    <el-button type="primary" icon="el-icon-plus" @click.stop="addChild">添加分类</el-button>
                   </span>
                 </span>
               </el-tree>
@@ -81,54 +43,68 @@
         </div>
       </el-container>
     </div>
+
+    <el-dialog title :visible.sync="dialogVisible" width="50%" :before-close="handleClose">
+      <!-- <span>这是一段信息</span> -->
+      <add-goods-type :list-row-data="rowData" />
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirm">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
+import { getCategory } from '@/api/menu.js'
 export default {
   data () {
-    const data = [{
-      id: 1,
-      label: '一级 1',
-      children: [{
-        id: 4,
-        label: '二级 1-1',
-        children: [{
-          id: 9,
-          label: '三级 1-1-1'
-        }, {
-          id: 10,
-          label: '三级 1-1-2'
-        }]
-      }]
-    }, {
-      id: 2,
-      label: '一级 2',
-      children: [{
-        id: 5,
-        label: '二级 2-1'
-      }, {
-        id: 6,
-        label: '二级 2-2'
-      }]
-    }, {
-      id: 3,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }]
     return {
-      data: JSON.parse(JSON.stringify(data)),
-      data: JSON.parse(JSON.stringify(data))
+      // 树结构数据
+      data: [],
+      // 对话框
+      dialogVisible: false
     }
+  },
+  created () {
+    this.getTypeList()
   },
 
   methods: {
-    append (data) {
+    // 获取分类数据
+    getTypeList () {
+      this.listLoading = true
+      getCategory().then(res => {
+        let data = res.data
+        let parentTree = this.toTreeData(data)
+        this.data = parentTree
+        console.log(parentTree)
+      })
+    },
+    // 将有父子关系的数组转换成树形结构数据
+    toTreeData (data, attr) {
+      data.forEach(ele => {
+        ele.label = ele.categoryName
+        let pid = ele.pid
+        if (pid === 0) {
+          //是根元素的hua ,不做任何操作,如果是正常的for-i循环,可以直接continue.
+        } else {
+          //如果ele是子元素的话 ,把ele扔到他的父亲的child数组中.
+          data.forEach(d => {
+            if (d.id === pid) {
+              let childArray = d.children
+              if (!childArray) {
+                childArray = []
+              }
+              childArray.push(ele)
+              d.children = childArray
+            }
+          })
+        }
+      })
+      //去除重复元素
+      return data.filter(ele => ele.pid === 0)
+    },
+    addCategory (data) {
       const newChild = { id: id++, label: 'testtest', children: [] }
       if (!data.children) {
         this.$set(data, 'children', [])
@@ -153,19 +129,19 @@ export default {
           </span>
         </span>)
     },
-    editCurent() {
+    editCurent () {
       console.log('editCurent')
     },
-    deleteCurent() {
+    deleteCurent () {
       console.log('deleteCurent')
     },
-    downCurent() {
+    downCurent () {
       console.log('downCurent')
     },
-    upCurent() {
+    upCurent () {
       console.log('upCurent')
     },
-    addChild() {
+    addChild () {
       console.log('addChild')
     }
   }

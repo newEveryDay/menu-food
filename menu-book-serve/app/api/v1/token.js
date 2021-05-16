@@ -38,7 +38,7 @@ router.post('/token', async (ctx, next) => {
   // 生成token
   console.log(token)
   ctx.body = {
-    code: 20000,
+    code: 200,
     data: {
       token
     },
@@ -56,7 +56,7 @@ router.get('/userInfo', async (ctx, next) => {
   // servre
 
   ctx.body = {
-    code: 20000,
+    code: 200,
     data: {
       roles: "admin", name: '小王', avatar: 'dfdfd', introduction: "dfdfdf"
     },
