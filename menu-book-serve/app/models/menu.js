@@ -55,14 +55,15 @@ Ingredient.init({
   foodname: Sequelize.STRING,  //原材料名称
   amount: Sequelize.INTEGER,   //对应的用量
   unit: Sequelize.STRING,
-  menuId: Sequelize.INTEGER
+  menuId: Sequelize.INTEGER,
+  img: Sequelize.STRING
 }, {
   sequelize,
   tableName: 'ingredient' // 重命名
 })
 
 Step.init({
-  image: Sequelize.STRING,   //对应步骤图
+  img: Sequelize.STRING,   //对应步骤图
   desc: Sequelize.STRING,
   menuId: Sequelize.INTEGER
 }, {
