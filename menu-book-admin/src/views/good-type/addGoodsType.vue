@@ -11,7 +11,7 @@
     <div class="el-elem-field">
       <div class="el-breadcrumbs">
         <span>菜谱分类</span>
-        <a class="el-bt" @click.prevent="dialogVisible=true">
+        <a class="el-bt" @click.prevent="showCategoryDialog()">
           <el-button type="primary" icon="el-icon-plus">一级分类</el-button>
         </a>
       </div>
@@ -30,11 +30,15 @@
                 <span slot-scope="{ node }" class="custom-tree-node">
                   <span>{{ node.label }}</span>
                   <span>
-                    <i class="el-icon-edit" @click.stop="editCurent" />
+                    <i class="el-icon-edit" @click.stop="showCategoryDialog('update',node)" />
                     <i class="el-icon-delete" @click.stop="deleteCurent" />
                     <i class="el-icon-sort-down" @click.stop="downCurent" />
                     <i class="el-icon-sort-up" @click.stop="upCurent" />
-                    <el-button type="primary" icon="el-icon-plus" @click.stop="addChild">添加分类</el-button>
+                    <el-button
+                      type="primary"
+                      icon="el-icon-plus"
+                      @click.stop="showCategoryDialog('addChild',node)"
+                    >添加分类</el-button>
                   </span>
                 </span>
               </el-tree>
@@ -44,32 +48,73 @@
       </el-container>
     </div>
 
-    <el-dialog title :visible.sync="dialogVisible" width="50%" :before-close="handleClose">
-      <!-- <span>这是一段信息</span> -->
-      <add-goods-type :list-row-data="rowData" />
+    <el-dialog title="新增分类" :visible.sync="centerDialogVisible" width="30%" center>
+      <el-card class="box-card">
+        <el-form ref="category" :model="category" label-width="100px" :rules="rules">
+          <el-form-item label="分类名称" prop="categoryName">
+            <el-input v-model="category.categoryName" />
+          </el-form-item>
+
+          <el-form-item label="分类描述" prop="description">
+            <el-input v-model="category.description" type="textarea" />
+          </el-form-item>
+        </el-form>
+      </el-card>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="confirm">确 定</el-button>
+        <el-button @click="resetForm('category')">取 消</el-button>
+        <el-button v-show="!isEdit" type="primary" @click="addCategory('category')">确 定</el-button>
+        <el-button v-show="isEdit" type="primary" @click="updtateCategory('category')">修改</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
-import { getCategory } from '@/api/menu.js'
+import { getCategory, addCategory, upDateCategory } from '@/api/menu.js'
+// import ZypCard from '@/components/ZypCard/ZypCard.vue'
 export default {
   data () {
     return {
       // 树结构数据
       data: [],
+      category: {
+        categoryName: '',
+        description: '',
+        pid: ""
+
+      },
+      rules: {
+        categoryName: [
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { min: 2, max: 10, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ]
+
+      },
       // 对话框
-      dialogVisible: false
+      centerDialogVisible: false,
+      isEdit: false
     }
   },
   created () {
     this.getTypeList()
   },
-
+  // components: {
+  //   // addGoodsType,
+  //   ZypCard
+  // },
   methods: {
+    showCategoryDialog (dialogType, node) {
+      this.centerDialogVisible = true
+      if (dialogType === "addChild") {
+        this.isEdit = false
+        this.addChildCategory(node)
+      } else if (dialogType === "update") {
+        this.isEdit = true
+        this.editCurent(node)
+      } else {
+        this.isEdit = false
+      }
+
+    },
     // 获取分类数据
     getTypeList () {
       this.listLoading = true
@@ -104,33 +149,16 @@ export default {
       //去除重复元素
       return data.filter(ele => ele.pid === 0)
     },
-    addCategory (data) {
-      const newChild = { id: id++, label: 'testtest', children: [] }
-      if (!data.children) {
-        this.$set(data, 'children', [])
+    editCurent (node) {
+      const data = node.data
+      let editDate = {
+        categoryName: data.categoryName,
+        description: '123',
+        id: data.id
+
       }
-      data.children.push(newChild)
-    },
-
-    remove (node, data) {
-      const parent = node.parent
-      const children = parent.data.children || parent.data
-      const index = children.findIndex(d => d.id === data.id)
-      children.splice(index, 1)
-    },
-
-    renderContent (h, { node, data, store }) {
-      return (
-        <span class='custom-tree-node'>
-          <span>{node.label}</span>
-          <span>
-            <el-button size='mini' type='text' on-click={() => this.append(data)}>Append</el-button>
-            <el-button size='mini' type='text' on-click={() => this.remove(node, data)}>Delete</el-button>
-          </span>
-        </span>)
-    },
-    editCurent () {
-      console.log('editCurent')
+      this.category = editDate
+      this.centerDialogVisible = true
     },
     deleteCurent () {
       console.log('deleteCurent')
@@ -141,8 +169,50 @@ export default {
     upCurent () {
       console.log('upCurent')
     },
-    addChild () {
-      console.log('addChild')
+
+    resetForm (formName) {
+      this.$refs[formName].resetFields()
+      this.centerDialogVisible = false
+    },
+    // 添加子分类获取pid
+    addChildCategory (node) {
+      this.category.pid = node.data.id
+    },
+    // 添加分类
+    addCategory (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          addCategory(this.category).then(res => {
+            this.$message({
+              message: '添加分类成功',
+              type: 'success'
+            })
+            this.getTypeList()
+            this.centerDialogVisible = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    updtateCategory (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          upDateCategory(this.category).then(res => {
+            this.resetForm('category')
+            this.$message({
+              message: '更新分类成功',
+              type: 'success'
+            })
+            this.getTypeList()
+            this.centerDialogVisible = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     }
   }
 }

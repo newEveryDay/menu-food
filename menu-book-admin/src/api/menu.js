@@ -2,12 +2,19 @@ import request from '@/utils/request'
 
 export function addCategory (data) {
   return request({
-    url: 'cms/goods/addCategory',
+    url: 'v1/category/addCategory',
     method: 'post',
     data
   })
 }
 
+export function upDateCategory (data) {
+  return request({
+    url: 'v1/category/upDateCategory',
+    method: 'post',
+    data
+  })
+}
 
 // 获取商品分类
 export function getCategory (params) {

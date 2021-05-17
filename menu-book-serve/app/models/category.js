@@ -1,5 +1,6 @@
 const { Sequelize, Model } = require('sequelize')
 const sequelize = require('../../db/index')
+const { NotFound } = require("../../core/http-exception")
 class Category extends Model {
   static async addCategory (pid, categoryName, icon) {
     const isPrarent = !pid
@@ -16,6 +17,27 @@ class Category extends Model {
         icon
       })
     }
+  }
+  static async upDateCategory (id, categoryName, icon = '') {
+    const category = await Category.findOne({
+      where: {
+        id,
+      }
+    })
+
+    if (!category) {
+      new NotFound()
+    } else {
+      await Category.update({
+        categoryName,
+        icon
+      }, {
+        where: {
+          id
+        }
+      })
+    }
+
   }
   static async getCategory (pid) {
     const category = await Category.findAll()

@@ -29,22 +29,22 @@ class CategoryValidator extends LinValidator {
 class CategoryPutValidator extends LinValidator {
   constructor() {
     super()
-    this.name = [
-      // 这里可以添加多个校验规则，但是规则是且的关系
-      // 三个参数：第一个参数：需要满足的规则，第二个参数：提示信息，第三个参数：可选参数
-      new Rule('isNotEmpty')
-
-    ]
     this.id = [
       // 这里可以添加多个校验规则，但是规则是且的关系
       // 三个参数：第一个参数：需要满足的规则，第二个参数：提示信息，第三个参数：可选参数
-      new Rule('isInt', '参数必须为正整数', { min: 1 })
+      new Rule('isNotEmpty')
 
     ]
-    this.description = [
+    this.categoryName = [
       // 这里可以添加多个校验规则，但是规则是且的关系
       // 三个参数：第一个参数：需要满足的规则，第二个参数：提示信息，第三个参数：可选参数
       new Rule('isNotEmpty')
+
+    ]
+    this.icon = [
+      // 这里可以添加多个校验规则，但是规则是且的关系
+      // 三个参数：第一个参数：需要满足的规则，第二个参数：提示信息，第三个参数：可选参数
+      new Rule('isOptional')
 
     ]
   }

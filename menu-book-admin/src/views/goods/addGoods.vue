@@ -8,74 +8,31 @@
       </el-steps>
     </zyp-card>
 
-    <!-- <el-card class="box-card">
-      <el-form ref="form" :model="form" label-width="100px">
-        <el-form-item label="商品名称">
-          <el-input v-model="form.mercName"></el-input>
-        </el-form-item>
-        <el-form-item label="商品价格">
-          <el-input v-model="form.price"></el-input>
-        </el-form-item>
-        <el-form-item label="库存数量">
-          <el-input v-model="form.stock"></el-input>
-        </el-form-item>
-
-        <el-form-item label="商品分类">
-          <el-select v-model="form.categoryId" placeholder="请选择商品分类">
-            <el-option v-for="vem in goodsTypeList" :key="vem.id" :label="vem.name" :value="vem.id"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="商品主图">
-          <div>
-            <el-upload
-              action="http://localhost:3000/v1/uploadImg"
-              list-type="picture-card"
-              :on-preview="handlePictureCardPreview"
-              :on-remove="handleRemove"
-              :on-success="handleAvatarSuccess"
-            >
-              <i class="el-icon-plus"></i>
-            </el-upload>
-            <el-dialog :visible.sync="dialogVisible">
-              <img width="100%" :src="dialogImageUrl" alt />
-            </el-dialog>
-          </div>
-        </el-form-item>
-
-        <el-form-item label="商品描述">
-          <el-input v-model="form.description" type="textarea">商品描述</el-input>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button type="primary" @click="onSubmit">添加商品</el-button>
-          <el-button>返回</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>-->
-    <el-form label-width="100px" @submit.native.prevent="save">
-      <el-tabs type="border-card">
+    <el-card class="box-card">
+      <el-form label-width="100px">
         <!--基本信息-->
-        <el-tab-pane label="基本信息">
+        <div label="基本信息" v-show="active==0">
           <el-form-item label="名称">
             <el-col :span="6">
               <el-input v-model="model.name" width="150" />
             </el-col>
           </el-form-item>
           <el-form-item label="所属分类">
-            <el-select v-model="model.parent">
+            <el-cascader :options="categorys" clearable @change="cascaderChange"></el-cascader>
+            <!-- <el-select v-model="model.parent">
               <el-option
                 v-for="item in parents"
                 :key="item._id"
                 :label="item.name"
                 :value="item._id"
               />
-            </el-select>
+            </el-select>-->
           </el-form-item>
           <el-form-item label="轮播图展示">
             <el-col :span="8">
               <el-carousel :interval="4000" type="card" height="80px">
                 <el-carousel-item v-for="(item,i) in model.images" :key="i">
-                  <img v-if="item.img" :src="item.img" class="avatar">
+                  <img v-if="item.img" :src="'http://127.0.0.1:3000/'+item.img" class="avatar" />
                 </el-carousel-item>
               </el-carousel>
             </el-col>
@@ -83,12 +40,13 @@
 
           <el-form-item label="上传轮播图">
             <el-upload
+              :action="'http://localhost:9527/dev-api/v1/upload'"
               :file-list="model.images.img"
               list-type="picture-card"
               :on-remove="handleRemove"
               :on-success="afterUpload"
             >
-              <i class="el-icon-plus avatar-uploader-icon" />
+              <i class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
 
@@ -108,13 +66,13 @@
             </el-col>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" style=" margin-top:10px;" native-type="submit">提交</el-button>
+            <el-button type="primary" style=" margin-top:10px;" @click="nextStep(1)">下一步</el-button>
           </el-form-item>
-        </el-tab-pane>
+        </div>
         <!--end of 基本信息-->
 
         <!--食材信息-->
-        <el-tab-pane label="食材准备" name="ingredient">
+        <div label="食材准备" name="ingredient" v-show="active==1">
           <el-button @click="model.ingredient.push({})">
             <i class="el-icon-plus" />添加食材
           </el-button>
@@ -142,13 +100,14 @@
             </el-form-item>
           </el-row>
           <el-form-item>
-            <el-button type="primary" style=" margin-top:10px;" native-type="submit">提交</el-button>
+            <el-button type="primary" style=" margin-top:10px;" @click="nextStep(0)">上一步</el-button>
+            <el-button type="primary" style=" margin-top:10px;" @click="nextStep(2)">下一步</el-button>
           </el-form-item>
-        </el-tab-pane>
+        </div>
         <!--end of 食材信息-->
 
         <!--料理步骤-->
-        <el-tab-pane label="料理步骤">
+        <div label="料理步骤" v-show="active==2">
           <el-button @click="model.step.push({})">
             <i class="el-icon-plus" />添加料理步骤
           </el-button>
@@ -165,7 +124,7 @@
                 :show-file-list="false"
                 :on-success="res=>$set(item,'image',res.url)"
               >
-                <img v-if="item.image" :src="item.image" class="avatar">
+                <img v-if="item.image" :src="item.image" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon" />
               </el-upload>
             </el-col>
@@ -183,16 +142,18 @@
           </el-row>
 
           <el-form-item>
+            <el-button type="primary" style=" margin-top:10px;" @click="nextStep(1)">上一步</el-button>
             <el-button type="primary" style=" margin-top:10px;" native-type="submit">提交</el-button>
           </el-form-item>
-        </el-tab-pane>
+        </div>
         <!--end of 料理步骤-->
-      </el-tabs>
-    </el-form>
+      </el-form>
+    </el-card>
   </div>
 </template>
 <script>
-import { getCategory, postGoods } from '@/api/goods'
+// import { getCategory, postGoods } from '@/api/goods'
+import { getCategory } from '@/api/menu.js'
 import ZypCard from '@/components/ZypCard/ZypCard.vue'
 export default {
   components: {
@@ -222,7 +183,6 @@ export default {
       //   上传相关信息
       dialogImageUrl: '',
       dialogVisible: false,
-      active: 1,
       fileList: [],
       texts: ['简单', '一般', '中等', '困难', '极难'],
       model: {
@@ -238,12 +198,14 @@ export default {
       },
       selectparent: '',
       parents: [],
-      units: ['勺', '克', '个', '片', '毫升', '斤', '滴', '根']
+      categorys: [],
+      units: ['勺', '克', '个', '片', '毫升', '斤', '滴', '根'],
+      active: 0
 
     }
   },
   created () {
-    this.getCategory()
+    this.getTypeList()
   },
   mounted () {
     if (Object.keys(this.listRowData).length > 0) {
@@ -251,10 +213,39 @@ export default {
     }
   },
   methods: {
-    getCategory () {
+    getTypeList () {
+      this.listLoading = true
       getCategory().then(res => {
-        this.goodsTypeList = res.data
+        let data = res.data
+        let parentTree = this.toTreeData(data)
+        this.categorys = parentTree
+        console.log(parentTree)
       })
+    },
+    // 将有父子关系的数组转换成树形结构数据
+    toTreeData (data, attr) {
+      data.forEach(ele => {
+        ele.label = ele.categoryName
+        ele.value = ele.id
+        let pid = ele.pid
+        if (pid === 0) {
+          //是根元素的hua ,不做任何操作,如果是正常的for-i循环,可以直接continue.
+        } else {
+          //如果ele是子元素的话 ,把ele扔到他的父亲的child数组中.
+          data.forEach(d => {
+            if (d.id === pid) {
+              let childArray = d.children
+              if (!childArray) {
+                childArray = []
+              }
+              childArray.push(ele)
+              d.children = childArray
+            }
+          })
+        }
+      })
+      //去除重复元素
+      return data.filter(ele => ele.pid === 0)
     },
     onSubmit () {
       postGoods(this.form).then(res => {
@@ -275,6 +266,26 @@ export default {
     },
     handleAvatarSuccess (res, file) {
       this.form.imgList.push(res.data)
+    },
+    afterUpload (res) {
+      //this.$push(this.model,'images',res.url)
+      this.model.images.push({ img: res.data.fileUrl })
+      // this.model.images=res.url;
+
+    },
+    nextStep (activeIndex) {
+      console.log(this.model)
+      setTimeout(() => {
+        this.active = activeIndex
+
+      })
+    },
+    tabClick (tab, event) {
+      console.log(tab)
+      console.log(event)
+    },
+    cascaderChange (e) {
+      console.log(e)
     }
   }
 }
