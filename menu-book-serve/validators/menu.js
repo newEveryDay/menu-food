@@ -41,6 +41,12 @@ class menuValidator extends LinValidator {
       new Rule('isOptional')
 
     ]
+    this.img = [
+      // 这里可以添加多个校验规则，但是规则是且的关系
+      // 三个参数：第一个参数：需要满足的规则，第二个参数：提示信息，第三个参数：可选参数
+      new Rule('isOptional')
+
+    ]
 
 
 

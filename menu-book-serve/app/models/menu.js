@@ -31,6 +31,7 @@ Menu.init({
     primaryKey: true,
     autoIncrement: true
   },
+  img: Sequelize.STRING,
   categoryId: Sequelize.INTEGER,
   // 难度系数
   difficulty: Sequelize.INTEGER,

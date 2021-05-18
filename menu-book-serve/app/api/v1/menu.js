@@ -6,17 +6,24 @@ const { Success, NotFound } = require("../../../core/http-exception")
 const {
   Sequelize,
   Model,
-  Op
+  Op,
+  JSON
 } = require('sequelize')
 const router = new Router({
   prefix: '/v1/menu'
 })
 router.post('/addmMenu', async (ctx, next) => {
   const v = await new menuValidator().validate(ctx)
+  console.log(ctx.request.body)
+  const image = v.get('body.img').map((item) => {
+    return item.img
+  }).join()
+  console.log('111', image)
   const baseMenu = {
     categoryId: v.get('body.categoryId'),
     difficulty: v.get('body.difficulty'),
     menuName: v.get('body.menuName'),
+    img: image,
     description: v.get('body.description')
   }
   try {

@@ -25,6 +25,8 @@ export function getCategory (params) {
   })
 }
 
+
+
 export function deleteProductCategory (id) {
   return request({
     url: `/category/${id}`,
@@ -32,6 +34,16 @@ export function deleteProductCategory (id) {
   })
 }
 
+
+// 新增商品
+
+export function addmMenu (data) {
+  return request({
+    url: `v1/menu/addmMenu`,
+    method: 'post',
+    data
+  })
+}
 // 新增商品
 
 export function postGoods (data) {
