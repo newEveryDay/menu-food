@@ -73,3 +73,12 @@ export function getGoods (params) {
   })
 }
 
+// 获取菜谱列表
+export function getMenuList (params) {
+  return request({
+    url: `v1/menu/getMenuList`,
+    method: 'get',
+    params
+  })
+}
+

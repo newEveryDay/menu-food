@@ -171,7 +171,7 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/',
+    path: '/goodType',
     component: Layout,
     name: 'goodType',
     redirect: '/goodType/addGoodsType',
@@ -187,15 +187,15 @@ export const asyncRoutes = [
         meta: {
           title: '商品分类', icon: 'dashboard', roles: ['editor']
         }
-      },
-      {
-        path: '/goodType/goodsTypeList',
-        name: 'goodsTypeList',
-        component: () => import('@/views/good-type/goodsTypeList'),
-        meta: {
-          title: '分类列表', icon: 'dashboard', roles: ['admin']
-        }
       }
+      // {
+      //   path: '/goodType/goodsTypeList',
+      //   name: 'goodsTypeList',
+      //   component: () => import('@/views/good-type/goodsTypeList'),
+      //   meta: {
+      //     title: '分类列表', icon: 'dashboard', roles: ['admin']
+      //   }
+      // }
     ]
   },
   {
@@ -223,6 +223,28 @@ export const asyncRoutes = [
         meta: {
           title: '商品列表', icon: 'dashboard', roles: ['admin']
         }
+      },
+      // {
+      //   path: 'create',
+      //   component: () => import('@/views/example/create'),
+      //   name: 'CreateArticle',
+      //   meta: { title: 'Create Article', icon: 'edit' }
+      // },
+      // {
+      //   path: 'edit/:id(\\d+)',
+      //   component: () => import('@/views/example/edit'),
+      //   name: 'EditArticle',
+      //   meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
+      //   hidden: true
+      // },
+      {
+        path: '/goods/editList',
+        name: 'editList',
+        component: () => import('@/views/goods/addGoods'),
+        meta: {
+          title: '编辑商品', icon: 'dashboard', activeMenu: '/goods/goodsList', roles: ['admin']
+        },
+        hidden: true
       }
     ]
   },

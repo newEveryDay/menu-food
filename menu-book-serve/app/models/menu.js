@@ -72,6 +72,10 @@ Step.init({
   tableName: 'step' // 重命名
 })
 
+// 添加一对多关系
+Menu.hasMany(Step, { as: "steps" })
+// 添加一对多关系
+Menu.hasMany(Ingredient, { as: "ingredients" })
 module.exports = {
   Menu,
   Step,

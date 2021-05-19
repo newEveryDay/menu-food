@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function postCategory(data) {
+export function postCategory (data) {
   return request({
     url: 'cms/goods/addCategory',
     method: 'post',
@@ -9,7 +9,16 @@ export function postCategory(data) {
 }
 
 // 获取商品分类
-export function getCategory(params) {
+export function getCategory (params) {
+  return request({
+    url: `v1/menu/getMenuList?size=2&page=2`,
+    method: 'get',
+    params
+  })
+}
+
+// 获取菜谱列表
+export function getMenuList (params) {
   return request({
     url: `cms/goods/getCategory`,
     method: 'get',
@@ -17,7 +26,7 @@ export function getCategory(params) {
   })
 }
 
-export function deleteProductCategory(id) {
+export function deleteProductCategory (id) {
   return request({
     url: `/category/${id}`,
     method: 'get'
@@ -26,7 +35,7 @@ export function deleteProductCategory(id) {
 
 // 新增商品
 
-export function postGoods(data) {
+export function postGoods (data) {
   return request({
     url: `cms/goods/addGood`,
     method: 'post',
@@ -35,7 +44,7 @@ export function postGoods(data) {
 }
 
 // 修改商品
-export function putGoods(data) {
+export function putGoods (data) {
   return request({
     url: '/goods',
     method: 'put',
@@ -45,7 +54,7 @@ export function putGoods(data) {
 
 // 查询商品列表
 
-export function getGoods(params) {
+export function getGoods (params) {
   return request({
     url: `/cms/goods/getGoods`,
     method: 'get',

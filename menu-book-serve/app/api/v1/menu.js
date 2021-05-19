@@ -88,6 +88,54 @@ router.post('/updataMenu/:id', async (ctx, next) => {
   }
 
 })
+
+// 查询商品列表
+router.get('/getMenuList', async (ctx, next) => {
+  let { page = 1, size = 10, title } = ctx.request.query
+
+  let offset = (parseInt(page) - 1) * parseInt(size)
+  const menuListCout = await Menu.findAndCountAll({
+    where: {
+      // name: 'cheny', // 精确查询
+      menuName: {
+        // 模糊查询
+        [Op.like]: '%' + title + '%'
+      }
+    }
+  })
+  const totalCout = menuListCout.count
+  const menuList = await Menu.findAll({
+    where: {
+      // name: 'cheny', // 精确查询
+      menuName: {
+        // 模糊查询
+        [Op.like]: '%' + title + '%'
+      }
+    },
+    include: [
+      {
+        model: Step,
+        as: "steps",
+        required: true
+      },
+      {
+        model: Ingredient,
+        as: "ingredients",
+        required: true
+      }
+    ],
+    offset,
+    limit: parseInt(size)
+  })
+  let restult = {
+    data: menuList,
+    page,
+    size,
+    totalCout: totalCout
+  }
+  // menuList.setDataValue("pageInfo", totalCout)
+  ctx.body = new Success('查询列表成功', restult)
+})
 // 获取菜谱详情
 router.get('/getMenuById/:id', async (ctx, next) => {
   const id = ctx.params.id
