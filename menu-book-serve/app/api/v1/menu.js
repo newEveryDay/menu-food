@@ -96,6 +96,7 @@ router.get('/getMenuList', async (ctx, next) => {
   let offset = (parseInt(page) - 1) * parseInt(size)
   const menuListCout = await Menu.findAndCountAll({
     where: {
+      // name: 'cheny', // 精确查询
       menuName: {
         // 模糊查询
         [Op.like]: '%' + title + '%'
@@ -105,6 +106,7 @@ router.get('/getMenuList', async (ctx, next) => {
   const totalCout = menuListCout.count
   const menuList = await Menu.findAll({
     where: {
+      // name: 'cheny', // 精确查询
       menuName: {
         // 模糊查询
         [Op.like]: '%' + title + '%'
