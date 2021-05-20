@@ -25,23 +25,16 @@
               v-model="menu.categoryIds"
             ></el-cascader>
           </el-form-item>
-          <!-- <el-form-item label="轮播图展示">
-            <el-col :span="8">
-              <el-carousel :interval="4000" type="card" height="80px">
-                <el-carousel-item v-for="(item,i) in menu.images" :key="i">
-                  <img v-if="item.img" :src="'http://127.0.0.1:3000/'+item.img" class="avatar" />
-                </el-carousel-item>
-              </el-carousel>
-            </el-col>
-          </el-form-item>-->
-
+          <!-- :file-list="menu.img" -->
           <el-form-item label="上传轮播图">
             <el-upload
+              class="upload-demo"
               :action="'http://localhost:9527/dev-api/v1/upload'"
-              :file-list="menu.img.img"
-              list-type="picture-card"
+              :on-preview="handlePreview"
               :on-remove="handleRemove"
-              :on-success="afterUpload"
+              :file-list="menu.imgLists"
+              :on-success="handleAvatarSuccess"
+              list-type="picture-card"
             >
               <i class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
@@ -73,11 +66,11 @@
         <!--end of 基本信息-->
         <!--食材信息-->
         <div label="食材准备" v-show="active==1">
-          <el-button @click="menu.ingredient.push({})">
+          <el-button @click="menu.ingredients.push({})">
             <i class="el-icon-plus" />添加食材
           </el-button>
           <el-row
-            v-for="(item,index) in menu.ingredient"
+            v-for="(item,index) in menu.ingredients"
             :key="index"
             :gutter="10"
             type="flex"
@@ -86,7 +79,7 @@
             <el-col :span="6">
               <el-form-item
                 label="食材"
-                :prop="`ingredient[${index}].foodname`"
+                :prop="`ingredients[${index}].foodname`"
                 :rules="rules.foodname"
               >
                 <el-input v-model="item.foodname" placeholder="请填写食材名称" />
@@ -95,7 +88,7 @@
             <el-col :span="3">
               <el-form-item
                 label="食材数量"
-                :prop="`ingredient[${index}].amount`"
+                :prop="`ingredients[${index}].amount`"
                 :rules="rules.amount"
               >
                 <el-input v-model="item.amount"></el-input>
@@ -103,7 +96,11 @@
             </el-col>
 
             <el-col :span="3">
-              <el-form-item label-width="0" :prop="`ingredient[${index}].unit`" :rules="rules.unit">
+              <el-form-item
+                label-width="0"
+                :prop="`ingredients[${index}].unit`"
+                :rules="rules.unit"
+              >
                 <el-select v-model="item.unit" placeholder="请选择单位">
                   <el-option v-for="u in units" :key="u" :label="u" :value="u" />
                 </el-select>
@@ -129,16 +126,17 @@
         </div>
         <!--料理步骤-->
         <div label="料理步骤" v-show="active==2">
-          <el-button @click="menu.step.push({})">
+          <el-button @click="menu.steps.push({})">
             <i class="el-icon-plus" />添加料理步骤
           </el-button>
           <el-row
-            v-for="(item,i) in menu.step"
+            v-for="(item,i) in menu.steps"
             :key="i"
             :gutter="20"
             type="flex"
             style="flex-wrap:wrap;margin-top:10px;"
           >
+            <!-- :on-success="res=>$set(item,'url',res.data.fileUrl)" -->
             <el-col :span="2.5">
               <el-upload
                 :action="'http://localhost:9527/dev-api/v1/upload'"
@@ -146,7 +144,7 @@
                 :show-file-list="false"
                 :on-success="res=>$set(item,'img',res.data.fileUrl)"
               >
-                <img v-if="item.img" :src="'http://127.0.0.1:3000/'+item.image" class="avatar" />
+                <img v-if="item.img" :src="'http://127.0.0.1:3000/'+item.img" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon" />
               </el-upload>
             </el-col>
@@ -158,14 +156,20 @@
                 size="small"
                 type="danger"
                 style=" margin-top:20px;"
-                @click="menu.step.splice(i,1)"
+                @click="menu.steps.splice(i,1)"
               >删除</el-button>
             </el-col>
           </el-row>
 
           <el-form-item>
             <el-button type="primary" style=" margin-top:10px;" @click="nextStep(1)">上一步</el-button>
-            <el-button type="primary" style=" margin-top:10px;" @click="onSubmit">提交</el-button>
+            <el-button
+              v-if="this.menuId"
+              type="primary"
+              style=" margin-top:10px;"
+              @click="updataMenu"
+            >修改</el-button>
+            <el-button v-else type="primary" style=" margin-top:10px;" @click="onSubmit">提交</el-button>
           </el-form-item>
         </div>
         <!--end of 料理步骤-->
@@ -175,7 +179,7 @@
 </template>
 <script>
 // import { getCategory, postGoods } from '@/api/goods'
-import { getCategory, addmMenu } from '@/api/menu.js'
+import { getCategory, addmMenu, getMenuById, updataMenu } from '@/api/menu.js'
 import ZypCard from '@/components/ZypCard/ZypCard.vue'
 export default {
   components: {
@@ -184,6 +188,7 @@ export default {
 
   data () {
     return {
+      fileList: [{ name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }, { name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }],
       // 上传相关信息
       dialogImageUrl: '',
       dialogVisible: false,
@@ -191,15 +196,18 @@ export default {
       menu: {
 
         menuName: '',
+        // 服务器返回的图片
         img: [],
+        // 上传到服务器的img
+        imgLists: [],
         difficulty: 1,
-        time: '',
+        time: '10',
         description: '',
-        ingredient: [
+        ingredients: [
 
 
         ],
-        step: [],
+        steps: [],
         categoryIds: []
 
       },
@@ -222,7 +230,7 @@ export default {
         // ],
         foodname: [
           { required: true, message: '请输入菜品名称', trigger: 'blur' },
-          { min: 3, max: 8, message: '长度在 3 到 8 个字符', trigger: 'blur' }
+          { min: 1, max: 8, message: '长度在 1 到 10 个字符', trigger: 'blur' }
         ],
         // step: [
         //   { type: Array, required: true, message: '请添加步骤', trigger: 'change' }
@@ -242,14 +250,21 @@ export default {
         amount: [
           { required: true, message: '请输入数量', trigger: 'blur' }
         ]
-      }
+      },
+      // 菜单id
+
     }
   },
   created () {
     this.getTypeList()
+    // 编辑时传入数据初始化菜谱信息
+    this.menuId = this.$route.query.id
+    if (!!this.menuId) {
+      this.getMenuById()
+    }
   },
   mounted () {
-
+    console.log(this.$route)
   },
   methods: {
     getTypeList () {
@@ -259,6 +274,25 @@ export default {
         let parentTree = this.toTreeData(data)
         this.categorys = parentTree
         console.log(parentTree)
+      })
+    },
+    getMenuById () {
+      getMenuById(this.menuId).then(res => {
+        var imgArr = res.data.img
+        if (!!imgArr) {
+          imgArr = imgArr.split(',').map(item => {
+            return {
+              url: "http://127.0.0.1:3000/" + item
+            }
+          })
+        }
+        res.data.img = imgArr ? imgArr : []
+        res.data.time = 10
+        this.menu = res.data
+        // 深拷贝应用-不明白原因
+        this.menu.imgLists = JSON.parse(JSON.stringify(imgArr))
+        this.menu.categoryIds = res.data.categoryId
+
       })
     },
     // 将有父子关系的数组转换成树形结构数据
@@ -286,6 +320,7 @@ export default {
       //去除重复元素
       return data.filter(ele => ele.pid === 0)
     },
+    // 创建菜谱
     onSubmit () {
       addmMenu(this.menu).then(res => {
         this.$message({
@@ -296,6 +331,19 @@ export default {
         this.active = 0
       })
     },
+    // 更新菜谱
+    updataMenu () {
+      console.log('更新', this.menu)
+      updataMenu(this.menu).then(res => {
+        this.$message({
+          message: '修改菜谱成功',
+          type: 'success'
+        })
+        // this.resetForm('baseinfo')
+        this.active = 0
+      })
+    },
+
     handleRemove (file, fileList) {
       console.log(file, fileList)
       //   thumb_id
@@ -305,11 +353,24 @@ export default {
       this.dialogVisible = true
     },
     handleAvatarSuccess (res, file) {
-      this.form.imgList.push(res.data)
+      // this.imageUrl = URL.createObjectURL(file.raw)
+      console.log(' this.imageUrl', this.imageUrl)
+      console.log('handleAvatarSuccess-before', this.menu.imgLists)
+      this.menu.img.push(
+        {
+          img: res.data.fileUrl
+        }
+      )
+      console.log('handleAvatarSuccess', this.menu.imgLists)
+      // console.log(res)
+      // console.log(file)
+      // item, 'url', res.data.fileUrl
+      // this.form.imgList.push(res.data)
     },
     afterUpload (res) {
       this.menu.img.push({ img: res.data.fileUrl })
     },
+
     nextStep (activeIndex) {
       console.log(this.menu)
       setTimeout(() => {
@@ -340,7 +401,8 @@ export default {
     resetForm (formName) {
       this.$refs[formName].resetFields()
       this.centerDialogVisible = false
-    },
+    }
+
   }
 }
 </script>

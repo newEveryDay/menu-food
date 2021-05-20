@@ -43,7 +43,7 @@
             <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
                 <el-button type="text" size="small" @click="handleClick(scope.row)">查看</el-button>
-                <router-link class="el-bt" :to="'/goods/editList'">
+                <router-link class="el-bt" :to="{path:'/goods/editList',query:{id:scope.row.id}}">
                   <el-button type="text" size="small" @click="edit">编辑</el-button>
                 </router-link>
               </template>
@@ -55,7 +55,7 @@
         <el-pagination
           :background="true"
           :current-page="page"
-          :page-sizes="[5, 20, 50, 100]"
+          :page-sizes="[10, 20, 50, 100]"
           :page-size="size"
           layout="total, sizes, prev, pager, next, jumper"
           :total="totalCout"
@@ -82,7 +82,7 @@ export default {
       menuList: [],
       totalCout: 0,
       page: 1,
-      size: 5
+      size: 10
     }
   },
   created () {

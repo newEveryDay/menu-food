@@ -29,13 +29,13 @@ router.post('/addmMenu', async (ctx, next) => {
   try {
     const baseMenuRelsut = await Menu.create(baseMenu)
     const menuId = baseMenuRelsut.id
-    const ingredient = v.get('body.ingredient').map((item) => {
+    const ingredient = v.get('body.ingredients').map((item) => {
       return {
         ...item,
         menuId
       }
     })
-    const step = v.get('body.step').map((item) => {
+    const step = v.get('body.steps').map((item) => {
       return {
         ...item,
         menuId
@@ -58,20 +58,30 @@ router.post('/addmMenu', async (ctx, next) => {
 router.post('/updataMenu/:id', async (ctx, next) => {
   const id = ctx.params.id
   const menu = ctx.request.body
-  const ingredient = menu.ingredient.map(item => {
+  const image = menu.img.map((item) => {
+    return item.img
+  }).join()
+
+  const baseMenu = {
+    ...menu,
+    img: image
+  }
+
+
+  const ingredient = menu.ingredients.map(item => {
     return {
       ...item,
       menuId: id
     }
   })
-  const step = menu.step.map(item => {
+  const step = menu.steps.map(item => {
     return {
       ...item,
       menuId: id
     }
   })
   try {
-    const menuInfo = await Menu.update(menu, {
+    const menuInfo = await Menu.update(baseMenu, {
       where: {
         id
       }

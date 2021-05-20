@@ -26,7 +26,11 @@
                 node-key="id"
                 :default-expand-all="false"
                 :expand-on-click-node="true"
+                :default-expanded-keys="defaultShowNodes"
+                @node-expand="handleNodeExpand"
+                @node-collapse="handleNodeCollapse"
               >
+                >
                 <span slot-scope="{ node }" class="custom-tree-node">
                   <span>{{ node.label }}</span>
                   <span>
@@ -91,7 +95,8 @@ export default {
       },
       // 对话框
       centerDialogVisible: false,
-      isEdit: false
+      isEdit: false,
+      defaultShowNodes: []
     }
   },
   created () {
@@ -211,6 +216,29 @@ export default {
         } else {
           console.log('error submit!!')
           return false
+        }
+      })
+    },
+    // 树节点展开
+    handleNodeExpand (data) {
+      // 保存当前展开的节点
+      let flag = false
+      this.defaultShowNodes.some(item => {
+        if (item === data.id) { // 判断当前节点是否存在， 存在不做处理
+          flag = true
+          return true
+        }
+      })
+      if (!flag) { // 不存在则存到数组里
+        this.defaultShowNodes.push(data.id)
+      }
+    },
+    // 树节点关闭
+    handleNodeCollapse (data) {
+      this.defaultShowNodes.some((item, i) => {
+        if (item === data.id) {
+          // 删除关闭节点
+          this.defaultShowNodes.length = i
         }
       })
     }

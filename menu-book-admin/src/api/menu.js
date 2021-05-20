@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-
+// 添加分类
 export function addCategory (data) {
   return request({
     url: 'v1/category/addCategory',
@@ -7,7 +7,7 @@ export function addCategory (data) {
     data
   })
 }
-
+// 修改分类
 export function upDateCategory (data) {
   return request({
     url: 'v1/category/upDateCategory',
@@ -44,7 +44,16 @@ export function addmMenu (data) {
     data
   })
 }
-// 新增商品
+// 修改分类
+
+export function updataMenu (data) {
+  return request({
+    url: `v1/menu/updataMenu/${data.id}`,
+    method: 'post',
+    data
+  })
+}
+
 
 export function postGoods (data) {
   return request({
@@ -53,6 +62,10 @@ export function postGoods (data) {
     data
   })
 }
+
+
+
+
 
 // 修改商品
 export function putGoods (data) {
@@ -81,4 +94,15 @@ export function getMenuList (params) {
     params
   })
 }
+
+
+
+// 通过id获取菜谱信息
+export function getMenuById (id) {
+  return request({
+    url: `v1/menu/getMenuById/${id}`,
+    method: 'get'
+  })
+}
+
 
