@@ -108,9 +108,29 @@
 		},
 
 		onLoad() {
+			
 			this.loadData();
+			// this.getOpenIdBycode()
 		},
 		methods: {
+			
+			// 获取维系code
+			 getOpenIdBycode(){
+				uni.login({
+					provider: 'weixin',
+					 success:async (res) => {
+						const params = {
+							account : res.code,
+							"type":100
+						}
+						const opeind =await this.$common.$service.$user.getWXLogin(params)
+						console.log(opeind)
+					},
+					fail: (err) => {
+						console.log('login fail:', err);
+					}
+				});
+			},
 			/**
 			 * 请求静态数据只是为了代码不那么乱
 			 * 分次请求未作整合

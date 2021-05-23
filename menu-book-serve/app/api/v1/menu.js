@@ -101,7 +101,8 @@ router.post('/updataMenu/:id', async (ctx, next) => {
 
 // 查询商品列表
 router.get('/getMenuList', async (ctx, next) => {
-  let { page = 1, size = 10, title } = ctx.request.query
+  let { page = 1, size = 10, title = '', id = '' } = ctx.request.query
+  console.log(ctx.request.query)
 
   let offset = (parseInt(page) - 1) * parseInt(size)
   const menuListCout = await Menu.findAndCountAll({
@@ -110,7 +111,8 @@ router.get('/getMenuList', async (ctx, next) => {
       menuName: {
         // 模糊查询
         [Op.like]: '%' + title + '%'
-      }
+      },
+      categoryId: id
     }
   })
   const totalCout = menuListCout.count
@@ -119,8 +121,10 @@ router.get('/getMenuList', async (ctx, next) => {
       // name: 'cheny', // 精确查询
       menuName: {
         // 模糊查询
-        [Op.like]: '%' + title + '%'
-      }
+        [Op.like]: '%' + title + '%',
+
+      },
+      categoryId: id
     },
     include: [
       {
@@ -146,6 +150,7 @@ router.get('/getMenuList', async (ctx, next) => {
   // menuList.setDataValue("pageInfo", totalCout)
   ctx.body = new Success('查询列表成功', restult)
 })
+
 // 获取菜谱详情
 router.get('/getMenuById/:id', async (ctx, next) => {
   const id = ctx.params.id

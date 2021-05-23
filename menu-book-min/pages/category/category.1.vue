@@ -10,7 +10,7 @@
 				<text class="s-item">{{item.categoryName}}</text>
 				<view class="t-list">
 					<view @click="navToList(item.id, titem.id)" v-if="titem.pid === item.id" class="t-item" v-for="titem in tlist" :key="titem.id">
-						<image :src="'http://127.0.0.1:3000/'+titem.icon"></image>
+						<image :src="titem.picture"></image>
 						<text>{{titem.categoryName}}</text>
 					</view>
 				</view>
@@ -49,14 +49,12 @@
 				list.forEach(item=>{
 					if(!item.pid){
 						this.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
-					}else if(!item.icon){
+					}else if(!item.picture){
 						this.slist.push(item); //没有图的是2级分类
 					}else{
 						this.tlist.push(item); //3级分类
 					}
 				}) 
-				console.log(this.tlist)
-				console.log(this.slist)
 			},
 			
 			
@@ -106,7 +104,7 @@
 				list.forEach(item=>{
 					if(!item.pid){
 						this.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
-					}else if(!item.icon){
+					}else if(!item.picture){
 						this.slist.push(item); //没有图的是2级分类
 					}else{
 						this.tlist.push(item); //3级分类

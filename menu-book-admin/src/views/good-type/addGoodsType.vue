@@ -58,7 +58,24 @@
           <el-form-item label="分类名称" prop="categoryName">
             <el-input v-model="category.categoryName" />
           </el-form-item>
-
+          <el-form-item label="图标" prop="description">
+            <el-col :span="2.5">
+              <el-upload
+                :action="'http://localhost:9527/dev-api/v1/upload'"
+                class="avatar-uploader"
+                :show-file-list="false"
+                :on-success="onSuccess"
+              >
+                <div>1111{{category.icon}}</div>
+                <img
+                  v-if="category.icon"
+                  :src="'http://127.0.0.1:3000/'+category.icon"
+                  class="avatar"
+                />
+                <i v-else class="el-icon-plus avatar-uploader-icon" />
+              </el-upload>
+            </el-col>
+          </el-form-item>
           <el-form-item label="分类描述" prop="description">
             <el-input v-model="category.description" type="textarea" />
           </el-form-item>
@@ -83,8 +100,7 @@ export default {
       category: {
         categoryName: '',
         description: '',
-        pid: ""
-
+        icon: ''
       },
       rules: {
         categoryName: [
@@ -159,8 +175,8 @@ export default {
       let editDate = {
         categoryName: data.categoryName,
         description: '123',
+        icon: data.icon,
         id: data.id
-
       }
       this.category = editDate
       this.centerDialogVisible = true
@@ -241,6 +257,12 @@ export default {
           this.defaultShowNodes.length = i
         }
       })
+    },
+    onSuccess (res) {
+      console.log(res)
+      // this.category.icon = res.data.fileUrl
+      // 为什么需要用set
+      this.$set(this.category, 'icon', res.data.fileUrl)
     }
   }
 }
@@ -318,6 +340,36 @@ export default {
   }
   ::v-deep .el-tree > .el-tree-node {
     margin: 10px 0;
+  }
+  .avatar-uploader .el-upload {
+    // height: 100%;
+    // width: 75px;
+    // line-height: 100%;
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    height: 75px;
+    width: 75px;
+    line-height: 75px;
+    // width: 178px;
+    // height: 178px;
+    // line-height: 178px;
+    text-align: center;
+    border: 1px dashed #d9d9d9;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
   }
 }
 </style>

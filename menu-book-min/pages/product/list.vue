@@ -23,15 +23,15 @@
 				@click="navToDetailPage(item)"
 			>
 				<view class="image-wrapper">
-					<image :src="item.image" mode="aspectFill"></image>
+					<image :src="'http://127.0.0.1:3000/'+item.img" mode="aspectFill"></image>
 				</view>
 				<view class="content-wrapper">
-					<text class="title clamp">{{item.title}}</text>
-					<view class="material">辣椒、蒜、葱、土豆、八角...</view>
+					<text class="title clamp">{{item.menuName}}</text>
+					<view class="material">{{item.ingredient}}</view>
 					<view class="author">作者</view>
 					<view class="visitor price-box">
-						<text class="visitor-count">浏览量{{item.price}}</text>
-						<text>收藏量 {{item.sales}}</text>
+						<text class="visitor-count">浏览量{{item.difficulty}}</text>
+						<!-- <text>收藏量 {{item.sales}}</text> -->
 					</view>
 				</view>
 			</view>
@@ -83,6 +83,7 @@
 			this.headerTop = document.getElementsByTagName('uni-page-head')[0].offsetHeight+'px';
 			// #endif
 			this.cateId = options.tid;
+			console.log(options)
 			this.loadCateList(options.fid,options.sid);
 			this.loadData();
 		},
@@ -105,7 +106,14 @@
 		methods: {
 			//加载分类
 			async loadCateList(fid, sid){
+				// const params = {
+				// 	page: 1,
+				// 	size: 10,
+				// 	id:this.cateId
+				// }
+				// const result = await this.$common.$service.$menu.getMenuList(params)
 				let list = await this.$api.json('cateList');
+				console.log('list',list)
 				let cateList = list.filter(item=>item.pid == fid);
 				
 				cateList.forEach(item=>{
@@ -113,6 +121,7 @@
 					item.child = tempList;
 				})
 				this.cateList = cateList;
+				console.log('this.cateList',this.cateList)
 			},
 			//加载商品 ，带下拉刷新和上滑加载
 			async loadData(type='add', loading) {
@@ -125,21 +134,36 @@
 				}else{
 					this.loadingType = 'more'
 				}
+				const params = {
+					page: 1,
+					size: 10,
+					id:this.cateId
+				}
+				const result = await this.$common.$service.$menu.getMenuList(params)
+				console.log(result)
+				let goodsList = result.data.data.map((item)=>{
+					return {
+						...item,
+						ingredient:item.ingredients.map((ingredient)=>{
+							return ingredient.foodname
+						}).join('、')
+					}
+				})
 				
-				let goodsList = await this.$api.json('goodsList');
+				// let goodsList = await this.$api.json('goodsList');
 				if(type === 'refresh'){
 					this.goodsList = [];
 				}
 				//筛选，测试数据直接前端筛选了
 				if(this.filterIndex === 1){
-					goodsList.sort((a,b)=>b.sales - a.sales)
+					goodsList.sort((a,b)=>b.difficulty - a.difficulty)
 				}
 				if(this.filterIndex === 2){
 					goodsList.sort((a,b)=>{
 						if(this.priceOrder == 1){
-							return a.price - b.price;
+							return a.difficulty - b.difficulty;
 						}
-						return b.price - a.price;
+						return b.difficulty - a.difficulty;
 					})
 				}
 				
@@ -199,8 +223,9 @@
 			},
 			//详情
 			navToDetailPage(item){
+				console.log(item)
 				//测试数据没有写id，用title代替
-				let id = item.title;
+				let id = item.id;
 				uni.navigateTo({
 					url: `/pages/product/product?id=${id}`
 				})

@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import store from './store'
+import service from '@/services';
+import environment from '@/environment';
 import App from './App'
+
 
 import Json from './Json' //测试用数据
 /**
@@ -31,6 +34,11 @@ const json = type=>{
 	})
 }
 
+
+let common = {
+	$service: service,
+	$environment: environment,
+};
 const prePage = ()=>{
 	let pages = getCurrentPages();
 	let prePage = pages[pages.length - 2];
@@ -46,7 +54,26 @@ Vue.prototype.$fire = new Vue();
 Vue.prototype.$store = store;
 Vue.prototype.$api = {msg, json, prePage};
 
-App.mpType = 'app'
+Vue.prototype.$store = store;
+Vue.prototype.$common = common;
+
+// uni.login({
+// 	provider: 'weixin',
+// 	 success:async (res) => {
+// 		console.log(res)
+// 		const params = {
+// 			account : res.code,
+// 			"type":100
+// 		}
+// 		const opeind =await common.$service.$user.getWXLogin(params)
+// 		console.log(opeind)
+// 	},
+// 	fail: (err) => {
+// 		console.log('login fail:', err);
+// 	}
+// });
+
+App.mpType = 'app'	
 
 const app = new Vue({
     ...App

@@ -1,11 +1,13 @@
 const Koa = require('koa')
 const logger = require('koa-logger')
 const bodyparser = require('koa-bodyparser')
+const cors = require('koa2-cors')
 const catchError = require('./middleWares/exception')
 const InitManager = require('./core/init')
 const static = require('koa-static')
 // 实例化koa
 const app = new Koa()
+app.use(cors())
 app.use(logger())
 // const book = require('./api/v1/book')
 // const classic = require('./api/v2/classic')

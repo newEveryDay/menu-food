@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const { secrety } = require("../config/config")
-const { Forbbiden } = require("../core/http-exception")
+const { Forbbiden, AuthFailed } = require("../core/http-exception")
 class Auth {
   constructor(leval) {
     this.leval = leval
@@ -34,6 +34,14 @@ class Auth {
         scope: decode.scope
       }
       await next()
+    }
+  }
+  static verifyToken (token) {
+    try {
+      jwt.verify(token, global.config.security.secretKey)
+      return true
+    } catch (e) {
+      return false
     }
   }
 }
