@@ -7,7 +7,9 @@
 // const {ImgModel} = require('../model/upload/upload');
 // const { User } = require('../app/models/user')
 // const {   Category } = require('../app/models/category')
-const { Menu, Step, Ingredient } = require('../app/models/menu')
+// const { Menu, Step, Ingredient } = require('../app/models/menu')
+
+const { Collect } = require('../app/models/collect')
 // // 同步表结构
 // User.sync({
 //   force: true  // 强制同步，先删除表，然后新建
@@ -15,13 +17,16 @@ const { Menu, Step, Ingredient } = require('../app/models/menu')
 // Category.sync({
 //   force: true  // 强制同步，先删除表，然后新建
 // });
-Menu.sync({
-  force: true  // 强制同步，先删除表，然后新建
-});
-Step.sync({
-  force: true  // 强制同步，先删除表，然后新建
-});
-Ingredient.sync({
+// Menu.sync({
+//   force: true  // 强制同步，先删除表，然后新建
+// });
+// Step.sync({
+//   force: true  // 强制同步，先删除表，然后新建
+// });
+// Ingredient.sync({
+//   force: true  // 强制同步，先删除表，然后新建
+// });
+Collect.sync({
   force: true  // 强制同步，先删除表，然后新建
 });
 // AdminModel.sync({

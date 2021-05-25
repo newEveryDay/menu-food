@@ -67,12 +67,30 @@ class Forbbiden extends HttpException {
     this.code = 403
   }
 }
+class CollectError extends HttpException {
+  constructor(code, msg, errorCode) {
+    super()
+    this.code = 400
+    this.msg = "你已经收藏了"
+    this.errorCode = 60002
+  }
+}
 
+class disCollectError extends HttpException {
+  constructor(code, msg, errorCode) {
+    super()
+    this.code = 400
+    this.msg = "你已取消收藏"
+    this.errorCode = 60002
+  }
+}
 module.exports = {
   HttpException,
   ParameterException,
   Success,
   NotFound,
   AuthFailed,
-  Forbbiden
+  Forbbiden,
+  CollectError,
+  disCollectError
 }

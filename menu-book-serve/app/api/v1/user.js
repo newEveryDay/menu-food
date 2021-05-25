@@ -24,4 +24,8 @@ router.post('/regisetr', async (ctx, next) => {
   await User.create(user)
   throw new Success()
 })
+
+router.get('/logout', async (ctx, next) => {
+  ctx.body = new Success('退出成功')
+})
 module.exports = router

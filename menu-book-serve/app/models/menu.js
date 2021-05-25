@@ -39,6 +39,8 @@ Menu.init({
   menuName: Sequelize.STRING,
   // 菜单描述
   description: Sequelize.STRING,
+  collectNums: Sequelize.INTEGER,
+  pageViewNums: Sequelize.INTEGER
 }, {
   sequelize,
   tableName: 'Menu'

@@ -7,6 +7,7 @@ const { User } = require("../../models/user")
 const { generateToken } = require("../../../core/utils")
 const { Auth } = require("../../../middleWares/auth")
 class WXManager {
+  constructor() { }
   static async codeToken (code) {
     const url = util.format(wx.url, wx.appId, wx.secret, code)
     console.log(url)

@@ -3,6 +3,9 @@ const { Auth } = require("../../../middleWares/auth")
 const { menuValidator } = require("../../../validators/menu")
 const { Menu, Step, Ingredient } = require("../../models/menu")
 const { Success, NotFound } = require("../../../core/http-exception")
+const { Collect } = require("../../models/collect")
+const { CollectValidator } = require("../../../validators/collect")
+
 const {
   Sequelize,
   Model,
@@ -105,27 +108,43 @@ router.get('/getMenuList', async (ctx, next) => {
   console.log(ctx.request.query)
 
   let offset = (parseInt(page) - 1) * parseInt(size)
-  const menuListCout = await Menu.findAndCountAll({
-    where: {
-      // name: 'cheny', // 精确查询
-      menuName: {
-        // 模糊查询
-        [Op.like]: '%' + title + '%'
-      },
-      categoryId: id
+  console.log(id)
+  let queryCriteria = {}
+  if (title && id) {
+    queryCriteria = {
+      [Op.and]: [
+        {
+          menuName: {
+            // 模糊查询
+            [Op.like]: '%' + title + '%',
+
+          },
+        },
+        { categoryId: id }
+      ]
     }
-  })
-  const totalCout = menuListCout.count
-  const menuList = await Menu.findAll({
-    where: {
-      // name: 'cheny', // 精确查询
+  } else if (title) {
+    queryCriteria = {
       menuName: {
         // 模糊查询
         [Op.like]: '%' + title + '%',
 
-      },
-      categoryId: id
-    },
+      }
+    }
+  } else if (id) {
+    queryCriteria = { categoryId: id }
+  } else {
+    queryCriteria = {}
+  }
+  const menuListCout = await Menu.findAndCountAll({
+    where: queryCriteria
+  })
+
+
+
+  const totalCout = menuListCout.count
+  const menuList = await Menu.findAll({
+    where: queryCriteria,
     include: [
       {
         model: Step,
@@ -175,5 +194,20 @@ router.get('/getMenuById/:id', async (ctx, next) => {
   menu.setDataValue('steps', steps)
   menu.setDataValue('ingredients', ingredients)
   ctx.body = new Success('创建成功', menu)
+})
+
+// // 获取用户收藏
+router.get('/collect', new Auth().m, async ctx => {
+  const menuLists = await Collect.getMyMenuCollect(ctx.auth.uid)
+  ctx.body = new Success("收藏列表", menuLists)
+})
+// 获取菜谱下的收藏信息
+router.get('/:MenuId/collect', new Auth().m, async ctx => {
+  const v = await new CollectValidator().validate(ctx, {
+    id: 'menuId'
+  })
+  const collect = await Collect.getMenuCollect(
+    v.get('path.MenuId'), ctx.auth.uid)
+  ctx.body = new Success('获取用户收藏信息', collect)
 })
 module.exports = router
