@@ -26,13 +26,13 @@ const menu = {
 	getWXLogin(params){
 		return http.post('/token', params, options);
 	},
-	// 获取用户信息
-	getUserInfo(params,token){
-		if(token){
-			options.header.token = token
-		}
-		return http.get('/profile.yj', params, options);
-	},
+	// // 获取用户信息
+	// getUserInfo(params,token){
+	// 	if(token){
+	// 		options.header.token = token
+	// 	}
+	// 	return http.get('/profile.yj', params, options);
+	// },
 	// 获取用户信息
 	wxBindPhone(params,token){
 		if(token){
@@ -40,55 +40,10 @@ const menu = {
 		}
 		return http.post('/wx_bind_phone.yj', params, options);
 	},
-	// 获取用户信息
-	getShopVideoList(params){
-		return http.get('/shop_video_list.yj', params, options);
-	},
-	// 店铺记录
-	getshopRecord(params,token){
-		if(token){
-			options.header.token = token
-		}
-		return http.get('/shop_record.yj', params, options);
-	},
-	// 添加店铺记录
-	lookRecord(params,token){
-		if(token){
-			options.header.token = token
-		}
-		return http.post('/look_record.yj', params, options);
-	},
-	// 添加店铺记录
-	totalime(params,token){
-		if(token){
-			options.header.token = token
-		}
-		return http.post('/total_time.yj', params, options);
-	},
-	shopTodayVistors(params,token){
-		if(token){
-			options.header.token = token
-		}
-		return http.get('/shop_today_vistors.yj', params, options);
-	},
-	// 意向用户
-	shopAbc(params,token){
-		if(token){
-			options.header.token = token
-		}
-		return http.get('/shop_abc.yj', params, options);
-	},
-	// 添加今日访客
-	addTodayVistors(params,token){
-		if(token){
-			options.header.token = token
-		}
-		return http.post('/add_today_vistors.yj', params, options);
+	// 获取菜谱下的收藏信息
+	getMenuCollect(MenuId){
+		return http.get(`/menu/${MenuId}/collect`, {}, options);
 	}
-	
-	
-	
-	
 };
 
 export default menu;

@@ -178,6 +178,13 @@
 				"navigationBarTitleText": "商品列表"
 			}
         }
+		,{
+		    "path" : "pages/collect/collect",
+		    "style" : {
+				"enablePullDownRefresh": true,
+				"navigationBarTitleText": "收藏"
+			}
+		}
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -203,7 +210,7 @@
 				"text": "菜谱"
 			},
 			{
-				"pagePath": "pages/cart/cart",
+				"pagePath": "pages/collect/collect",
 				"iconPath": "static/tab-cart.png",
 				"selectedIconPath": "static/tab-cart-current.png",
 				"text": "收藏"

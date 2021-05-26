@@ -24,6 +24,9 @@ const user = {
 	getWXLogin(params){
 		return http.post('/token', params, options);
 	},
+	updataUserInfo(params){
+		return http.post('/user/update', params, options);
+	},
 	// 获取用户信息
 	getUserInfo(params,token){
 		if(token){

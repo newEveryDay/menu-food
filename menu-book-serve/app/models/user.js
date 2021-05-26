@@ -34,6 +34,22 @@ class User extends Model {
       openid
     })
   }
+  static async unpdataUserInfo (usrInfo, uid) {
+
+    const user = await User.findOne({
+      where: {
+        id: uid
+      }
+    })
+    if (!user) {
+      throw new NotFound()
+    }
+    await User.update(usrInfo, {
+      where: {
+        id: uid
+      }
+    })
+  }
 }
 // Sequelize.STRING数据类型为字符串
 // Sequelize.STRING(64)最小长度为64

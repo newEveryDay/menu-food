@@ -31,8 +31,8 @@
 			<text class="title">{{menuDetail.menuName}}</text>
 
 			<view class="bot-row">
-				<text>收藏111111: {{menuDetail.difficulty}}</text>
-				<!-- <text>浏览量: 768</text> -->
+				<text>收藏 {{menuDetail.collectNums?menuDetail.collectNums:0}}</text>
+				<text>浏览量 {{menuDetail.pageViewNums?menuDetail.pageViewNums:0}}</text>
 			</view>
 		</view>
 		<view class="des">
@@ -40,6 +40,10 @@
 		</view>
 		<!-- 材料 -->
 		<view class="ingredient">
+			<view class="header">
+				<view class="title">用料</view>
+				<view class="basket" @click="dopBasket">丢进菜篮子</view>
+			</view>
 			<view class="ingredient-item" v-for="item in menuDetail.ingredients">
 				<view class="menu-name">{{item.foodname}}</view>
 				<view class="menu-count">{{item.amount+item.unit}}</view>
@@ -52,9 +56,10 @@
 				<text>图文详情</text>
 			</view>
 			<view class="steps">
-				<view class="steps-item" v-for="step in menuDetail.steps">
+				<view class="steps-item" v-for="(step,index) in menuDetail.steps">
+					<view class="step-title">步骤{{index+1}}</view>
 					<image class="img" :src="'http://127.0.0.1:3000/'+step.img"></image>
-					<view>{{step.desc}}</view>
+					<view class="des">{{step.desc}}</view>
 				</view>
 			</view>
 			<!-- <rich-text :nodes="desc"></rich-text> -->
@@ -62,7 +67,16 @@
 
 		<!-- 底部操作菜单 -->
 		<view class="page-bottom">
-			<navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
+			<view class="p-b-btn" :class="{active: favorite}" @click="toFavorite">
+				<text class="yticon icon-shoucang"></text>
+				<text>收藏</text>
+			</view>
+			<navigator url="/pages/cart/cart" open-type="switchTab" class="p-b-btn">
+				<text class="yticon icon-gouwuche"></text>
+				<text>分享</text>
+			</navigator>
+			
+			<!-- <navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
 				<text class="yticon icon-xiatubiao--copy"></text>
 				<text>首页</text>
 			</navigator>
@@ -78,7 +92,9 @@
 			<view class="action-btn-group">
 				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
 				<button type="primary" class=" action-btn no-border add-cart-btn">加入购物车</button>
-			</view>
+			</view> -->
+			<!-- <button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
+			<button type="primary" class=" action-btn no-border add-cart-btn">加入购物车</button> -->
 		</view>
 
 
@@ -129,7 +145,7 @@
 				specClass: 'none',
 				specSelected:[],
 				queryMenuDetail:{},
-				favorite: true,
+				favorite: false,
 				shareList: [],
 				imgList: [
 					{
@@ -207,17 +223,19 @@
 						pid: 2,
 						name: '草木绿',
 					},
-				]
+				],
+				// 订单id
+				id:''
 			};
 		},
 		async onLoad(options){
 			console.log('detail',options)
 			
 			//接收传值,id里面放的是标题，因为测试数据并没写id 
-			let id = options.id;
-			if(id){
-				this.$api.msg(`点击了${id}`);
-			}
+			this.id = options.id;
+			// if(id){
+			// 	this.$api.msg(`点击了${id}`);
+			// }
 			
 			
 			//规格 默认选中第一条
@@ -231,9 +249,10 @@
 				}
 			})
 			const params = {
-				id
+				id:this.id
 			}
 			const result = await this.$common.$service.$menu.getMenuById(params)
+			this.getMenuCollect(this.id)
 			result.data.img = result.data.img?result.data.img.split():[],
 			this.menuDetail = result.data
 			
@@ -285,13 +304,50 @@
 			},
 			//收藏
 			toFavorite(){
-				this.favorite = !this.favorite;
+				if(this.favorite){
+					this.cancelCollectMenu()
+				}else{
+					this.collectMenu()
+				}
+			},
+			collectMenu(){
+				const params = {
+					id:this.id
+				}
+				 this.$common.$service.$collect.collectMenu(params).then((res)=>{
+					 if(res&&res.code==200){
+						 this.favorite = true;
+						 uni.showToast({
+							 title:'收藏成功'
+						 })
+					 }
+				 })
+			},
+			cancelCollectMenu(){
+				const params = {
+					id:this.id
+				}
+				 this.$common.$service.$collect.cancelCollectMenu(params).then((res)=>{
+					 if(res&&res.code==200){
+						 this.favorite = false;
+						 uni.showToast({
+							 title:'取消成功'
+						 })
+					 }
+				 })
 			},
 			buy(){
 				uni.navigateTo({
 					url: `/pages/order/createOrder`
 				})
 			},
+			// 获取菜谱下的收藏信息
+			async getMenuCollect(){
+				const result =await  this.$common.$service.$menu.getMenuCollect(this.id)
+				this.favorite = result.data.collecteStatus
+				console.log(result)
+			},
+			dopBasket(){},
 			stopPrevent(){}
 		},
 
@@ -731,21 +787,19 @@
 	/* 底部操作菜单 */
 	.page-bottom{
 		position:fixed;
-		left: 30upx;
-		bottom:30upx;
 		z-index: 95;
 		display: flex;
-		justify-content: center;
+		justify-content: space-around;
 		align-items: center;
-		width: 690upx;
+		width: 100%;
 		height: 100upx;
-		background: rgba(255,255,255,.9);
-		box-shadow: 0 0 20upx 0 rgba(0,0,0,.5);
 		border-radius: 16upx;
-		
+		background: #fff;
+		border-top: 2rpx solid #ddd;
+		bottom: 0;
 		.p-b-btn{
 			display:flex;
-			flex-direction: column;
+			/* flex-direction: column; */
 			align-items: center;
 			justify-content: center;
 			font-size: $font-sm;
@@ -768,48 +822,54 @@
 				font-size: 46upx;
 			}
 		}
-		.action-btn-group{
-			display: flex;
-			height: 76upx;
-			border-radius: 100px;
-			overflow: hidden;
-			box-shadow: 0 20upx 40upx -16upx #fa436a;
-			box-shadow: 1px 2px 5px rgba(219, 63, 96, 0.4);
-			background: linear-gradient(to right, #ffac30,#fa436a,#F56C6C);
-			margin-left: 20upx;
-			position:relative;
-			&:after{
-				content: '';
-				position:absolute;
-				top: 50%;
-				right: 50%;
-				transform: translateY(-50%);
-				height: 28upx;
-				width: 0;
-				border-right: 1px solid rgba(255,255,255,.5);
-			}
-			.action-btn{
-				display:flex;
-				align-items: center;
-				justify-content: center;
-				width: 180upx;
-				height: 100%;
-				font-size: $font-base ;
-				padding: 0;
-				border-radius: 0;
-				background: transparent;
-			}
-		}
-		
 	}
 	.ingredient{
-		padding: 10rpx 20rpx;
-		.ingredient-item{
+		
+		padding: 20rpx 30rpx;
+		background: #fff;
+		.header{
 			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding-bottom: 20rpx;
+			.title{
+				font-weight: bold;
+				font-size: 32rpx;
+				color: #333;
+			}
+			.basket{
+				border-radius: 40rpx;
+				border:2rpx solid #d6d7dc;
+				font-size: 24rpx;
+				color: #666;
+				padding: 10rpx 20rpx;
+			}
+		}
+		.ingredient-item{
+			font-size: 28rpx;
+			color: #333;
+			display: flex;
+			border-bottom: 2rpx #e6e6e6 solid;
+			padding: 20rpx 0;
 			justify-content: space-between;
 		}
 	}
 	.steps{
+		.steps-item{
+			padding: 10rpx 30rpx;
+			padding-bottom: 2rpx solid #d6d7dc;
+			.step-title{
+				color: #333;
+				font-size: 28rpx;
+				font-weight: bold;
+				font-size: 30rpx;
+				padding: 20rpx 0;
+			}
+			.des{
+				padding: 30rpx 0;
+			}
+			
+		}
 		.img{
 			width: 100%;
 		}
