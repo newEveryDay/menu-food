@@ -339,21 +339,17 @@ export default {
           message: '修改菜谱成功',
           type: 'success'
         })
-        // this.resetForm('baseinfo')
         this.active = 0
       })
     },
 
     handleRemove (file, fileList) {
-      console.log(file, fileList)
-      //   thumb_id
     },
     handlePictureCardPreview (file) {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
     },
     handleAvatarSuccess (res, file) {
-      // this.imageUrl = URL.createObjectURL(file.raw)
       console.log(' this.imageUrl', this.imageUrl)
       console.log('handleAvatarSuccess-before', this.menu.imgLists)
       this.menu.img.push(
@@ -361,11 +357,6 @@ export default {
           img: res.data.fileUrl
         }
       )
-      console.log('handleAvatarSuccess', this.menu.imgLists)
-      // console.log(res)
-      // console.log(file)
-      // item, 'url', res.data.fileUrl
-      // this.form.imgList.push(res.data)
     },
     afterUpload (res) {
       this.menu.img.push({ img: res.data.fileUrl })
@@ -437,9 +428,6 @@ export default {
     margin: 0;
   }
   .avatar-uploader .el-upload {
-    // height: 100%;
-    // width: 75px;
-    // line-height: 100%;
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
     cursor: pointer;

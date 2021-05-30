@@ -1,22 +1,6 @@
 <template>
 	<view class="container">
-		<!-- 	<view class="carousel">
-			<swiper indicator-dots circular=true duration="400" >
-				<swiper-item class="swiper-item" v-for="(item,index) in imgList" :key="index">
-					{{index+item}}
-					<view class="image-wrapper">
-						<image
-							:src="'http:127.0.0.1:3000/'+item" 
-							class="loaded" 
-							mode="aspectFill"
-						></image>
-						<image :src="item.img"></image>
-						<image :src="'http://127.0.0.1:3000/'+item"></image>
-					</view>
-				</swiper-item>
-			</swiper>
-		</view>
-		 -->
+		
 		<view class="carousel">
 			<swiper indicator-dots circular=true duration="400">
 				<swiper-item class="swiper-item" v-for="(item,index) in menuDetail.img" :key="index">
@@ -42,7 +26,7 @@
 		<view class="ingredient">
 			<view class="header">
 				<view class="title">用料</view>
-				<view class="basket" @click="dopBasket">丢进菜篮子</view>
+				<view class="basket" @click="basketAction">{{menuIsaddTobasket?'从菜篮子移除':'丢进菜篮子'}}</view>
 			</view>
 			<view class="ingredient-item" v-for="item in menuDetail.ingredients">
 				<view class="menu-name">{{item.foodname}}</view>
@@ -64,6 +48,11 @@
 			</view>
 			<!-- <rich-text :nodes="desc"></rich-text> -->
 		</view>
+		<view class="basket-bt" :class="[menuIsaddTobasket?'hide':'show']">
+			<view @click="goBasket">
+				<image class="img" src="../../static/basket.png"></image>
+			</view>
+		</view>
 
 		<!-- 底部操作菜单 -->
 		<view class="page-bottom">
@@ -75,346 +64,204 @@
 				<text class="yticon icon-gouwuche"></text>
 				<text>分享</text>
 			</navigator>
-			
-			<!-- <navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
-				<text class="yticon icon-xiatubiao--copy"></text>
-				<text>首页</text>
-			</navigator>
-			<navigator url="/pages/cart/cart" open-type="switchTab" class="p-b-btn">
-				<text class="yticon icon-gouwuche"></text>
-				<text>购物车</text>
-			</navigator>
-			<view class="p-b-btn" :class="{active: favorite}" @click="toFavorite">
-				<text class="yticon icon-shoucang"></text>
-				<text>收藏</text>
-			</view>
-
-			<view class="action-btn-group">
-				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
-				<button type="primary" class=" action-btn no-border add-cart-btn">加入购物车</button>
-			</view> -->
-			<!-- <button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
-			<button type="primary" class=" action-btn no-border add-cart-btn">加入购物车</button> -->
 		</view>
-
-
-		<!-- 规格-模态层弹窗 -->
-		<view class="popup spec" :class="specClass" @touchmove.stop.prevent="stopPrevent" @click="toggleSpec">
-			<!-- 遮罩层 -->
-			<view class="mask"></view>
-			<view class="layer attr-content" @click.stop="stopPrevent">
-				<view class="a-t">
-					<image src="https://gd3.alicdn.com/imgextra/i3/0/O1CN01IiyFQI1UGShoFKt1O_!!0-item_pic.jpg_400x400.jpg"></image>
-					<view class="right">
-						<text class="price">¥328.00</text>
-						<text class="stock">库存：188件</text>
-						<view class="selected">
-							已选：
-							<text class="selected-text" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
-								{{sItem.name}}
-							</text>
-						</view>
-					</view>
-				</view>
-				<view v-for="(item,index) in specList" :key="index" class="attr-list">
-					<text>{{item.name}}</text>
-					<view class="item-list">
-						<text v-for="(childItem, childIndex) in specChildList" v-if="childItem.pid === item.id" :key="childIndex" class="tit"
-						 :class="{selected: childItem.selected}" @click="selectSpec(childIndex, childItem.pid)">
-							{{childItem.name}}
-						</text>
-					</view>
-				</view>
-				<button class="btn" @click="toggleSpec">完成</button>
-			</view>
-		</view>
-		<!-- 分享 -->
-		<share ref="share" :contentHeight="580" :shareList="shareList"></share>
+		
 	</view>
 </template>
 
 <script>
-	import share from '@/components/share';
-	export default{
+	import {Basket} from '@/models/basket.js'
+	export default {
 		components: {
-			share
 		},
 		data() {
 			return {
-				menuDetail:{},
-				specClass: 'none',
-				specSelected:[],
-				queryMenuDetail:{},
+				menuDetail: {},
+				specSelected: [],
+				queryMenuDetail: {},
 				favorite: false,
-				shareList: [],
-				imgList: [
-					{
-						src: 'https://gd3.alicdn.com/imgextra/i3/0/O1CN01IiyFQI1UGShoFKt1O_!!0-item_pic.jpg_400x400.jpg'
-					},
-					{
-						src: 'https://gd3.alicdn.com/imgextra/i3/TB1RPFPPFXXXXcNXpXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg'
-					},
-					{
-						src: 'https://gd2.alicdn.com/imgextra/i2/38832490/O1CN01IYq7gu1UGShvbEFnd_!!38832490.jpg_400x400.jpg'
-					}
-				],
-				desc: `
-					<div style="width:100%">
-						<img style="width:100%;display:block;" src="https://gd3.alicdn.com/imgextra/i4/479184430/O1CN01nCpuLc1iaz4bcSN17_!!479184430.jpg_400x400.jpg" />
-						<img style="width:100%;display:block;" src="https://gd2.alicdn.com/imgextra/i2/479184430/O1CN01gwbN931iaz4TzqzmG_!!479184430.jpg_400x400.jpg" />
-						<img style="width:100%;display:block;" src="https://gd3.alicdn.com/imgextra/i3/479184430/O1CN018wVjQh1iaz4aupv1A_!!479184430.jpg_400x400.jpg" />
-						<img style="width:100%;display:block;" src="https://gd4.alicdn.com/imgextra/i4/479184430/O1CN01tWg4Us1iaz4auqelt_!!479184430.jpg_400x400.jpg" />
-						<img style="width:100%;display:block;" src="https://gd1.alicdn.com/imgextra/i1/479184430/O1CN01Tnm1rU1iaz4aVKcwP_!!479184430.jpg_400x400.jpg" />
-					</div>
-				`,
-				specList: [
-					{
-						id: 1,
-						name: '尺寸',
-					},
-					{	
-						id: 2,
-						name: '颜色',
-					},
-				],
-				specChildList: [
-					{
-						id: 1,
-						pid: 1,
-						name: 'XS',
-					},
-					{
-						id: 2,
-						pid: 1,
-						name: 'S',
-					},
-					{
-						id: 3,
-						pid: 1,
-						name: 'M',
-					},
-					{
-						id: 4,
-						pid: 1,
-						name: 'L',
-					},
-					{
-						id: 5,
-						pid: 1,
-						name: 'XL',
-					},
-					{
-						id: 6,
-						pid: 1,
-						name: 'XXL',
-					},
-					{
-						id: 7,
-						pid: 2,
-						name: '白色',
-					},
-					{
-						id: 8,
-						pid: 2,
-						name: '珊瑚粉',
-					},
-					{
-						id: 9,
-						pid: 2,
-						name: '草木绿',
-					},
-				],
 				// 订单id
-				id:''
+				id: '',
+				// 菜谱是否添加入菜篮子中
+				menuIsaddTobasket:false
 			};
 		},
-		async onLoad(options){
-			console.log('detail',options)
-			
+		async onLoad(options) {
 			//接收传值,id里面放的是标题，因为测试数据并没写id 
 			this.id = options.id;
-			// if(id){
-			// 	this.$api.msg(`点击了${id}`);
-			// }
-			
-			
-			//规格 默认选中第一条
-			this.specList.forEach(item=>{
-				for(let cItem of this.specChildList){
-					if(cItem.pid === item.id){
-						this.$set(cItem, 'selected', true);
-						this.specSelected.push(cItem);
-						break; //forEach不能使用break
-					}
-				}
-			})
 			const params = {
-				id:this.id
+				id: this.id
 			}
 			const result = await this.$common.$service.$menu.getMenuById(params)
 			this.getMenuCollect(this.id)
-			result.data.img = result.data.img?result.data.img.split():[],
+			const menuIsaddTobasket = this.isCheckAddIngredientsTobasket()
+			if(menuIsaddTobasket){
+				this.menuIsaddTobasket = true
+			}else{
+				this.menuIsaddTobasket = false
+			}
+			result.data.img = result.data.img ? result.data.img.split() : [];
 			this.menuDetail = result.data
-			
-			console.log('this.menuDetail',this.menuDetail)
-			this.shareList = await this.$api.json('shareList');
-			const queryResult= await this.$api.json('queryid');
-			this.queryMenuDetail  = queryResult.result.data[0]
-			console.log(this.queryMenuDetail)
+			this.addPageViewNum()
+			console.log('this.menuDetail', this.menuDetail)
+			const queryResult = await this.$api.json('queryid');
+			this.queryMenuDetail = queryResult.result.data[0]
 		},
-		methods:{
-			//规格弹窗开关
-			toggleSpec() {
-				if(this.specClass === 'show'){
-					this.specClass = 'hide';
-					setTimeout(() => {
-						this.specClass = 'none';
-					}, 250);
-				}else if(this.specClass === 'none'){
-					this.specClass = 'show';
-				}
-			},
-			//选择规格
-			selectSpec(index, pid){
-				let list = this.specChildList;
-				list.forEach(item=>{
-					if(item.pid === pid){
-						this.$set(item, 'selected', false);
-					}
-				})
-
-				this.$set(list[index], 'selected', true);
-				//存储已选择
-				/**
-				 * 修复选择规格存储错误
-				 * 将这几行代码替换即可
-				 * 选择的规格存放在specSelected中
-				 */
-				this.specSelected = []; 
-				list.forEach(item=>{ 
-					if(item.selected === true){ 
-						this.specSelected.push(item); 
-					} 
-				})
-				
-			},
-			//分享
-			share(){
-				this.$refs.share.toggleMask();	
-			},
+		methods: {
 			//收藏
-			toFavorite(){
-				if(this.favorite){
+			toFavorite() {
+				if (this.favorite) {
 					this.cancelCollectMenu()
-				}else{
+				} else {
 					this.collectMenu()
 				}
 			},
-			collectMenu(){
+			// 收藏成功
+			collectMenu() {
 				const params = {
-					id:this.id
+					id: this.id
 				}
-				 this.$common.$service.$collect.collectMenu(params).then((res)=>{
-					 if(res&&res.code==200){
-						 this.favorite = true;
-						 uni.showToast({
-							 title:'收藏成功'
-						 })
-					 }
-				 })
+				this.$common.$service.$collect.collectMenu(params).then((res) => {
+					if (res && res.code == 200) {
+						this.favorite = true;
+						uni.showToast({
+							title: '收藏成功'
+						})
+					}
+				})
 			},
-			cancelCollectMenu(){
+			// 取消收藏
+			cancelCollectMenu() {
 				const params = {
-					id:this.id
+					id: this.id
 				}
-				 this.$common.$service.$collect.cancelCollectMenu(params).then((res)=>{
-					 if(res&&res.code==200){
-						 this.favorite = false;
-						 uni.showToast({
-							 title:'取消成功'
-						 })
-					 }
-				 })
+				this.$common.$service.$collect.cancelCollectMenu(params).then((res) => {
+					if (res && res.code == 200) {
+						this.favorite = false;
+						uni.showToast({
+							title: '取消成功'
+						})
+					}
+				})
 			},
-			buy(){
+			buy() {
 				uni.navigateTo({
 					url: `/pages/order/createOrder`
 				})
 			},
 			// 获取菜谱下的收藏信息
-			async getMenuCollect(){
-				const result =await  this.$common.$service.$menu.getMenuCollect(this.id)
+			async getMenuCollect() {
+				const result = await this.$common.$service.$menu.getMenuCollect(this.id)
 				this.favorite = result.data.collecteStatus
 				console.log(result)
 			},
-			dopBasket(){},
-			stopPrevent(){}
+			// 添加浏览数量
+			addPageViewNum() {
+				this.$common.$service.$menu.addPageViewNum(this.id).then(res => {
+					console.log('添加成功')
+				})
+			},
+			basketAction(){
+				if(!this.menuIsaddTobasket){
+					Basket.addIngredientsTobasket(this.menuDetail)
+					this.menuIsaddTobasket = true
+				}else{
+					Basket.dorpIngredientsFrombasket(this.id)
+					this.menuIsaddTobasket = false
+				}
+			},
+			// 查询菜谱素材是否放入菜篮子中
+			isCheckAddIngredientsTobasket(){
+				const ingredientListInfo = uni.getStorageSync('ingredientLists')?JSON.parse(uni.getStorageSync('ingredientLists')):[]
+				if(ingredientListInfo.length>0){
+					return ingredientListInfo.find((ele) => {
+							return (ele.id == this.id)
+					})  
+				}
+			},
+			goBasket(){
+				uni.navigateTo({
+					url:`../basket/basket`
+				})
+			},
+
+			stopPrevent() {}
 		},
 
 	}
 </script>
 
 <style lang='scss'>
-	page{
+	page {
 		background: $page-color-base;
 		padding-bottom: 160upx;
 	}
-	.icon-you{
+
+	.icon-you {
 		font-size: $font-base + 2upx;
 		color: #888;
 	}
+
 	.carousel {
 		height: 600upx;
-		position:relative;
-		swiper{
+		position: relative;
+
+		swiper {
 			height: 100%;
 		}
-		.image-wrapper{
+
+		.image-wrapper {
 			width: 100%;
 			height: 100%;
 		}
+
 		.swiper-item {
 			display: flex;
 			justify-content: center;
 			align-content: center;
 			height: 750upx;
 			overflow: hidden;
+
 			image {
 				width: 100%;
 				height: 100%;
 			}
 		}
-		
+
 	}
-	
+
 	/* 标题简介 */
-	.introduce-section{
+	.introduce-section {
 		background: #fff;
 		padding: 20upx 30upx;
-		
-		.title{
+
+		.title {
 			font-size: 32upx;
 			color: $font-color-dark;
 			height: 50upx;
 			line-height: 50upx;
 		}
-		.price-box{
-			display:flex;
-			align-items:baseline;
+
+		.price-box {
+			display: flex;
+			align-items: baseline;
 			height: 64upx;
 			padding: 10upx 0;
 			font-size: 26upx;
-			color:$uni-color-primary;
+			color: $uni-color-primary;
 		}
-		.price{
+
+		.price {
 			font-size: $font-lg + 2upx;
 		}
-		.m-price{
-			margin:0 12upx;
+
+		.m-price {
+			margin: 0 12upx;
 			color: $font-color-light;
 			text-decoration: line-through;
 		}
-		.coupon-tip{
+
+		.coupon-tip {
 			align-items: center;
 			padding: 4upx 10upx;
 			background: $uni-color-primary;
@@ -422,59 +269,66 @@
 			color: #fff;
 			border-radius: 6upx;
 			line-height: 1;
-			transform: translateY(-4upx); 
+			transform: translateY(-4upx);
 		}
-		.bot-row{
-			display:flex;
-			align-items:center;
+
+		.bot-row {
+			display: flex;
+			align-items: center;
 			height: 50upx;
 			font-size: $font-sm;
 			color: $font-color-light;
-			text{
+
+			text {
 				/* flex: 1; */
 				padding-right: 40rpx;
 			}
 		}
 	}
-	.des{
+
+	.des {
 		font-size: 28rpx;
 		line-height: 42rpx;
 		color: #999;
 		background-color: #fff;
 		padding: 0 20rpx;
 	}
+
 	/* 分享 */
-	.share-section{
-		display:flex;
-		align-items:center;
+	.share-section {
+		display: flex;
+		align-items: center;
 		color: $font-color-base;
 		background: linear-gradient(left, #fdf5f6, #fbebf6);
 		padding: 12upx 30upx;
-		.share-icon{
-			display:flex;
-			align-items:center;
+
+		.share-icon {
+			display: flex;
+			align-items: center;
 			width: 70upx;
 			height: 30upx;
 			line-height: 1;
 			border: 1px solid $uni-color-primary;
 			border-radius: 4upx;
-			position:relative;
+			position: relative;
 			overflow: hidden;
 			font-size: 22upx;
 			color: $uni-color-primary;
-			&:after{
+
+			&:after {
 				content: '';
 				width: 50upx;
 				height: 50upx;
 				border-radius: 50%;
 				left: -20upx;
 				top: -12upx;
-				position:absolute;
+				position: absolute;
 				background: $uni-color-primary;
 			}
 		}
-		.icon-xingxing{
-			position:relative;
+
+		.icon-xingxing {
+			position: relative;
 			z-index: 1;
 			font-size: 24upx;
 			margin-left: 2upx;
@@ -482,130 +336,153 @@
 			color: #fff;
 			line-height: 1;
 		}
-		.tit{
+
+		.tit {
 			font-size: $font-base;
-			margin-left:10upx;
+			margin-left: 10upx;
 		}
-		.icon-bangzhu1{
+
+		.icon-bangzhu1 {
 			padding: 10upx;
 			font-size: 30upx;
 			line-height: 1;
 		}
-		.share-btn{
+
+		.share-btn {
 			flex: 1;
-			text-align:right;
+			text-align: right;
 			font-size: $font-sm;
 			color: $uni-color-primary;
 		}
-		.icon-you{
+
+		.icon-you {
 			font-size: $font-sm;
 			margin-left: 4upx;
 			color: $uni-color-primary;
 		}
 	}
-	
-	.c-list{
+
+	.c-list {
 		font-size: $font-sm + 2upx;
 		color: $font-color-base;
 		background: #fff;
-		.c-row{
-			display:flex;
-			align-items:center;
+
+		.c-row {
+			display: flex;
+			align-items: center;
 			padding: 20upx 30upx;
-			position:relative;
+			position: relative;
 		}
-		.tit{
+
+		.tit {
 			width: 140upx;
 		}
-		.con{
+
+		.con {
 			flex: 1;
 			color: $font-color-dark;
-			.selected-text{
+
+			.selected-text {
 				margin-right: 10upx;
 			}
 		}
-		.bz-list{
+
+		.bz-list {
 			height: 40upx;
 			font-size: $font-sm+2upx;
 			color: $font-color-dark;
-			text{
+
+			text {
 				display: inline-block;
 				margin-right: 30upx;
 			}
 		}
-		.con-list{
+
+		.con-list {
 			flex: 1;
-			display:flex;
+			display: flex;
 			flex-direction: column;
 			color: $font-color-dark;
 			line-height: 40upx;
 		}
-		.red{
+
+		.red {
 			color: $uni-color-primary;
 		}
 	}
-	
+
 	/* 评价 */
-	.eva-section{
+	.eva-section {
 		display: flex;
 		flex-direction: column;
 		padding: 20upx 30upx;
 		background: #fff;
 		margin-top: 16upx;
-		.e-header{
+
+		.e-header {
 			display: flex;
 			align-items: center;
 			height: 70upx;
 			font-size: $font-sm + 2upx;
 			color: $font-color-light;
-			.tit{
+
+			.tit {
 				font-size: $font-base + 2upx;
 				color: $font-color-dark;
 				margin-right: 4upx;
 			}
-			.tip{
+
+			.tip {
 				flex: 1;
 				text-align: right;
 			}
-			.icon-you{
+
+			.icon-you {
 				margin-left: 10upx;
 			}
 		}
 	}
-	.eva-box{
+
+	.eva-box {
 		display: flex;
 		padding: 20upx 0;
-		.portrait{
+
+		.portrait {
 			flex-shrink: 0;
 			width: 80upx;
 			height: 80upx;
 			border-radius: 100px;
 		}
-		.right{
+
+		.right {
 			flex: 1;
 			display: flex;
 			flex-direction: column;
 			font-size: $font-base;
 			color: $font-color-base;
 			padding-left: 26upx;
-			.con{
+
+			.con {
 				font-size: $font-base;
 				color: $font-color-dark;
 				padding: 20upx 0;
 			}
-			.bot{
+
+			.bot {
 				display: flex;
 				justify-content: space-between;
 				font-size: $font-sm;
-				color:$font-color-light;
+				color: $font-color-light;
 			}
 		}
 	}
+
 	/*  详情 */
-	.detail-desc{
+	.detail-desc {
 		background: #fff;
 		margin-top: 16upx;
-		.d-header{
+
+		.d-header {
 			display: flex;
 			justify-content: center;
 			align-items: center;
@@ -613,14 +490,15 @@
 			font-size: $font-base + 2upx;
 			color: $font-color-dark;
 			position: relative;
-				
-			text{
+
+			text {
 				padding: 0 20upx;
 				background: #fff;
 				position: relative;
 				z-index: 1;
 			}
-			&:after{
+
+			&:after {
 				position: absolute;
 				left: 50%;
 				top: 50%;
@@ -628,41 +506,48 @@
 				width: 300upx;
 				height: 0;
 				content: '';
-				border-bottom: 1px solid #ccc; 
+				border-bottom: 1px solid #ccc;
 			}
 		}
 	}
-	
+
 	/* 规格选择弹窗 */
-	.attr-content{
+	.attr-content {
 		padding: 10upx 30upx;
-		.a-t{
+
+		.a-t {
 			display: flex;
-			image{
+
+			image {
 				width: 170upx;
 				height: 170upx;
 				flex-shrink: 0;
 				margin-top: -40upx;
-				border-radius: 8upx;;
+				border-radius: 8upx;
+				;
 			}
-			.right{
+
+			.right {
 				display: flex;
 				flex-direction: column;
 				padding-left: 24upx;
 				font-size: $font-sm + 2upx;
 				color: $font-color-base;
 				line-height: 42upx;
-				.price{
+
+				.price {
 					font-size: $font-lg;
 					color: $uni-color-primary;
 					margin-bottom: 10upx;
 				}
-				.selected-text{
+
+				.selected-text {
 					margin-right: 10upx;
 				}
 			}
 		}
-		.attr-list{
+
+		.attr-list {
 			display: flex;
 			flex-direction: column;
 			font-size: $font-base + 2upx;
@@ -670,11 +555,13 @@
 			padding-top: 30upx;
 			padding-left: 10upx;
 		}
-		.item-list{
+
+		.item-list {
 			padding: 20upx 0 0;
 			display: flex;
 			flex-wrap: wrap;
-			text{
+
+			text {
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -688,13 +575,14 @@
 				font-size: $font-base;
 				color: $font-color-dark;
 			}
-			.selected{
+
+			.selected {
 				background: #fbebee;
 				color: $uni-color-primary;
 			}
 		}
 	}
-	
+
 	/*  弹出层 */
 	.popup {
 		position: fixed;
@@ -703,28 +591,34 @@
 		right: 0;
 		bottom: 0;
 		z-index: 99;
-		
+
 		&.show {
 			display: block;
-			.mask{
+
+			.mask {
 				animation: showPopup 0.2s linear both;
 			}
+
 			.layer {
 				animation: showLayer 0.2s linear both;
 			}
 		}
+
 		&.hide {
-			.mask{
+			.mask {
 				animation: hidePopup 0.2s linear both;
 			}
+
 			.layer {
 				animation: hideLayer 0.2s linear both;
 			}
 		}
+
 		&.none {
 			display: none;
 		}
-		.mask{
+
+		.mask {
 			position: fixed;
 			top: 0;
 			width: 100%;
@@ -732,6 +626,7 @@
 			z-index: 1;
 			background-color: rgba(0, 0, 0, 0.4);
 		}
+
 		.layer {
 			position: fixed;
 			z-index: 99;
@@ -740,7 +635,8 @@
 			min-height: 40vh;
 			border-radius: 10upx 10upx 0 0;
 			background-color: #fff;
-			.btn{
+
+			.btn {
 				height: 66upx;
 				line-height: 66upx;
 				border-radius: 100upx;
@@ -750,43 +646,51 @@
 				margin: 30upx auto 20upx;
 			}
 		}
+
 		@keyframes showPopup {
 			0% {
 				opacity: 0;
 			}
+
 			100% {
 				opacity: 1;
 			}
 		}
+
 		@keyframes hidePopup {
 			0% {
 				opacity: 1;
 			}
+
 			100% {
 				opacity: 0;
 			}
 		}
+
 		@keyframes showLayer {
 			0% {
 				transform: translateY(120%);
 			}
+
 			100% {
 				transform: translateY(0%);
 			}
 		}
+
 		@keyframes hideLayer {
 			0% {
 				transform: translateY(0);
 			}
+
 			100% {
 				transform: translateY(120%);
 			}
 		}
 	}
-	
+
 	/* 底部操作菜单 */
-	.page-bottom{
-		position:fixed;
+	.page-bottom {
+		position: fixed;
 		z-index: 95;
 		display: flex;
 		justify-content: space-around;
@@ -797,8 +701,9 @@
 		background: #fff;
 		border-top: 2rpx solid #ddd;
 		bottom: 0;
-		.p-b-btn{
-			display:flex;
+
+		.p-b-btn {
+			display: flex;
 			/* flex-direction: column; */
 			align-items: center;
 			justify-content: center;
@@ -806,46 +711,56 @@
 			color: $font-color-base;
 			width: 96upx;
 			height: 80upx;
-			.yticon{
+
+			.yticon {
 				font-size: 40upx;
 				line-height: 48upx;
 				color: $font-color-light;
 			}
-			&.active, &.active .yticon{
+
+			&.active,
+			&.active .yticon {
 				color: $uni-color-primary;
 			}
-			.icon-fenxiang2{
+
+			.icon-fenxiang2 {
 				font-size: 42upx;
 				transform: translateY(-2upx);
 			}
-			.icon-shoucang{
+
+			.icon-shoucang {
 				font-size: 46upx;
 			}
 		}
 	}
-	.ingredient{
-		
+
+	.ingredient {
+
 		padding: 20rpx 30rpx;
 		background: #fff;
-		.header{
+
+		.header {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
 			padding-bottom: 20rpx;
-			.title{
+
+			.title {
 				font-weight: bold;
 				font-size: 32rpx;
 				color: #333;
 			}
-			.basket{
+
+			.basket {
 				border-radius: 40rpx;
-				border:2rpx solid #d6d7dc;
+				border: 2rpx solid #d6d7dc;
 				font-size: 24rpx;
 				color: #666;
 				padding: 10rpx 20rpx;
 			}
 		}
-		.ingredient-item{
+
+		.ingredient-item {
 			font-size: 28rpx;
 			color: #333;
 			display: flex;
@@ -854,26 +769,74 @@
 			justify-content: space-between;
 		}
 	}
-	.steps{
-		.steps-item{
+
+	.steps {
+		.steps-item {
 			padding: 10rpx 30rpx;
 			padding-bottom: 2rpx solid #d6d7dc;
-			.step-title{
+
+			.step-title {
 				color: #333;
 				font-size: 28rpx;
 				font-weight: bold;
 				font-size: 30rpx;
 				padding: 20rpx 0;
 			}
-			.des{
+
+			.des {
 				padding: 30rpx 0;
 			}
-			
+
 		}
-		.img{
+
+		.img {
 			width: 100%;
+		}
+	}
+	.basket-bt{
+		height: 84rpx;
+		width: 84rpx;
+		background-color: #ff521d;
+		border-radius: 128rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		animation: left 2s ;
+		position: fixed;
+		left: -84rpx;
+		bottom: 160rpx;
+		.img{
+			width: 64rpx;
+			height: 64rpx;
+		}
+		&.show{
+			animation: showBasket 0.2s linear both;
+		}
+		
+		&.hide{
+			animation: hideBasket 0.2s linear both;
+		}
+		
+		
+	}
+	@keyframes showBasket {
+		0% {
+			transform: translateX(120%);
+		}
+	
+		100% {
+			transform: translateX(0%);
+		}
+	}
+	
+	@keyframes hideBasket {
+		0% {
+			transform: translateX(0);
+		}
+	
+		100% {
+			transform: translateX(120%);
 		}
 	}
 	
 </style>
-

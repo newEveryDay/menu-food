@@ -83,12 +83,12 @@
 		</view>
 
 		<view class="guess-section">
-			<view v-for="(item, index) in goodsList" :key="index" class="guess-item" @click="navToDetailPage(item)">
+			<view v-for="(item, index) in menuList" :key="index" class="guess-item" @click="navToDetailPage(item)">
 				<view class="image-wrapper">
-					<image :src="item.image" mode="aspectFill"></image>
+					<image :src="'http://127.0.0.1:3000'+item.img" mode="aspectFill"></image>
 				</view>
-				<text class="title clamp">{{item.title}}</text>
-				<text class="price">￥{{item.price}}</text>
+				<text class="title clamp">{{item.menuName}}</text>
+				<text class="price">浏览量：{{item.pageViewNums}}</text>
 			</view>
 		</view>
 	</view>
@@ -103,17 +103,22 @@
 				swiperCurrent: 0,
 				swiperLength: 0,
 				carouselList: [],
-				goodsList: []
+				menuList: []
 			};
 		},
 
 		onLoad() {
-			
 			this.loadData();
-			// this.getOpenIdBycode()
+			this.getGuessYoulike()
 		},
 		methods: {
-			
+			// 获取猜你喜欢
+			getGuessYoulike(){
+				this.$common.$service.$guessYouLike.guessYouLike().then(res=>{
+					console.log('获取猜你喜欢',res)
+					this.menuList = res.data
+				})
+			},
 			// 获取维系code
 			 getOpenIdBycode(){
 				uni.login({
@@ -153,7 +158,7 @@
 			//详情页
 			navToDetailPage(item) {
 				//测试数据没有写id，用title代替
-				let id = item.title;
+				let id = item.id;
 				uni.navigateTo({
 					url: `/pages/product/product?id=${id}`
 				})

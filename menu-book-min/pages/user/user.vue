@@ -57,9 +57,9 @@
 					<text class="num">0</text>
 					<text>优惠券</text>
 				</view>
-				<view class="tj-item">
+				<view class="tj-item" @click="goToBasket"> 
 					<text class="num">20</text>
-					<text>积分</text>
+					<text>菜篮子</text>
 				</view>
 			</view>
 			<!-- 订单 -->
@@ -152,6 +152,12 @@
 				})
 			}
 		},
+		onHide(){
+			console.log('onhide')
+		},
+		onUnload(){
+			console.log('onUnload')
+		},
 		// #endif
 		computed: {
 			...mapState(['hasLogin', 'userInfo'])
@@ -224,6 +230,11 @@
 				this.moving = false;
 				this.coverTransition = 'transform 0.3s cubic-bezier(.21,1.93,.53,.64)';
 				this.coverTransform = 'translateY(0px)';
+			},
+			goToBasket(){
+				uni.navigateTo({
+					url:'../basket/basket'
+				})
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 const Router = require("koa-router")
 const { Auth } = require("../../../middleWares/auth")
-const { menuValidator } = require("../../../validators/menu")
+const { menuValidator, menuIdValidator } = require("../../../validators/menu")
 const { Menu, Step, Ingredient } = require("../../models/menu")
 const { Success, NotFound } = require("../../../core/http-exception")
 const { Collect } = require("../../models/collect")
@@ -209,5 +209,19 @@ router.get('/:MenuId/collect', new Auth().m, async ctx => {
   const collect = await Collect.getMenuCollect(
     v.get('path.MenuId'), ctx.auth.uid)
   ctx.body = new Success('获取用户收藏信息', collect)
+})
+// 添加浏览量
+router.get('/:MenuId/pageViewNum', new Auth().m, async ctx => {
+  const v = await new menuIdValidator().validate(ctx, {
+    id: 'menuId'
+  })
+  console.log(v.get('path.MenuId'))
+  await Menu.addPageViewNum(v.get('path.MenuId'))
+  const restult = await Menu.findOne({
+    where: {
+      id: v.get('path.MenuId')
+    }
+  })
+  ctx.body = new Success('获取浏览记录', restult)
 })
 module.exports = router

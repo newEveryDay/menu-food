@@ -1,11 +1,25 @@
 const bcrypt = require('bcryptjs')
-const { Sequelize, Model } = require('sequelize')
+const { Sequelize, Model, CITEXT } = require('sequelize')
 const sequelize = require('../../db/index')
 const { NotFound, AuthFailed } = require("../../core/http-exception")
 class Menu extends Model {
   static async addMenu () {
 
   }
+  static async addPageViewNum (menuId) {
+    const menu = await Menu.findOne({
+      where: {
+        id: menuId
+      }
+    })
+    if (!menu) {
+      throw new NotFound()
+    }
+    await menu.increment('pageViewNums', {
+      by: 1,
+    })
+  }
+
 }
 // Sequelize.STRING数据类型为字符串
 // Sequelize.STRING(64)最小长度为64

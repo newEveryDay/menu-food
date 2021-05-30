@@ -26,6 +26,7 @@ const menu = {
 	getWXLogin(params){
 		return http.post('/token', params, options);
 	},
+	
 	// // 获取用户信息
 	// getUserInfo(params,token){
 	// 	if(token){
@@ -43,7 +44,15 @@ const menu = {
 	// 获取菜谱下的收藏信息
 	getMenuCollect(MenuId){
 		return http.get(`/menu/${MenuId}/collect`, {}, options);
-	}
+	},
+	// 获取菜谱下的收藏信息
+	getMenuCollectList(){
+		return http.get(`/menu/collect`, {}, options);
+	},
+	// 获取菜谱下的收藏信息
+	addPageViewNum(MenuId){
+		return http.get(`/menu/${MenuId}/pageViewNum`, {}, options);
+	},
 };
 
 export default menu;

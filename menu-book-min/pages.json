@@ -185,6 +185,10 @@
 				"navigationBarTitleText": "收藏"
 			}
 		}
+        ,{
+            "path" : "pages/basket/basket",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
