@@ -7,9 +7,9 @@ Vue.use(Router)
 import Layout from '@/layout'
 
 /* Router Modules */
-import componentsRouter from './modules/components'
+// import componentsRouter from './modules/components'
 // import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
+// import tableRouter from './modules/table'
 // import nestedRouter from './modules/nested'
 
 /**
@@ -262,10 +262,10 @@ export const asyncRoutes = [
   },
 
   /** when your routing map is too long, you can split it into small modules **/
-  componentsRouter,
+  // componentsRouter,
   // chartsRouter,
   // nestedRouter,
-  tableRouter,
+  // tableRouter,
 
   // {
   //   path: '/example',
@@ -299,18 +299,18 @@ export const asyncRoutes = [
   //   ]
   // },
 
-  {
-    path: '/tab',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/tab/index'),
-        name: 'Tab',
-        meta: { title: 'Tab', icon: 'tab' }
-      }
-    ]
-  },
+  // {
+  //   path: '/tab',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/tab/index'),
+  //       name: 'Tab',
+  //       meta: { title: 'Tab', icon: 'tab' }
+  //     }
+  //   ]
+  // },
 
   // {
   //   path: '/error',
