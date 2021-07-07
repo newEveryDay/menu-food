@@ -85,7 +85,7 @@
 		<view class="guess-section">
 			<view v-for="(item, index) in menuList" :key="index" class="guess-item" @click="navToDetailPage(item)">
 				<view class="image-wrapper">
-					<image :src="'http://127.0.0.1:3000'+item.img" mode="aspectFill"></image>
+					<image :src="'http://127.0.0.1:3000/'+item.img" mode="aspectFill"></image>
 				</view>
 				<text class="title clamp">{{item.menuName}}</text>
 				<text class="price">浏览量：{{item.pageViewNums}}</text>

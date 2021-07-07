@@ -224,4 +224,28 @@ router.get('/:MenuId/pageViewNum', new Auth().m, async ctx => {
   })
   ctx.body = new Success('获取浏览记录', restult)
 })
+// 模糊搜索功能
+router.get('/:MenuId/pageViewNum', new Auth().m, async ctx => {
+  const v = await new menuIdValidator().validate(ctx, {
+    id: 'menuId'
+  })
+  console.log(v.get('path.MenuId'))
+  await Menu.addPageViewNum(v.get('path.MenuId'))
+  const restult = await Menu.findOne({
+    where: {
+      id: v.get('path.MenuId')
+    }
+  })
+  ctx.body = new Success('获取浏览记录', restult)
+})
+router.get('/searchMenu', async ctx => {
+  const keyWord = ctx.query
+  console.log('获取浏览记录', Menu.searchMenu(keyWord))
+  const menuList = await Menu.searchMenu(keyWord)
+
+
+  ctx.body = new Success('获取浏览记录', menuList)
+})
+
+
 module.exports = router

@@ -41,6 +41,7 @@ class Category extends Model {
   }
   static async getCategory (pid) {
     const category = await Category.findAll()
+
     return category
   }
 }

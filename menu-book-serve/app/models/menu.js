@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs')
-const { Sequelize, Model, CITEXT } = require('sequelize')
+const { Sequelize, Model, CITEXT, Op } = require('sequelize')
 const sequelize = require('../../db/index')
 const { NotFound, AuthFailed } = require("../../core/http-exception")
 class Menu extends Model {
@@ -18,6 +18,19 @@ class Menu extends Model {
     await menu.increment('pageViewNums', {
       by: 1,
     })
+  }
+
+  static async searchMenu (params) {
+    const { keyWord } = params
+    console.log(keyWord)
+    console.log(params)
+    const menuList = await Menu.findAll({
+      where: {
+        menuName: { [Op.like]: `%${keyWord}%` }
+      }
+    })
+    console.log(typeof menuList)
+    return menuList
   }
 
 }

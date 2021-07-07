@@ -3,6 +3,7 @@ import store from './store'
 import service from '@/services';
 import environment from '@/environment';
 import App from './App'
+import { Token } from "./services/token";
 
 
 import Json from './Json' //测试用数据
@@ -72,6 +73,9 @@ Vue.prototype.$common = common;
 // 		console.log('login fail:', err);
 // 	}
 // });
+
+const token = new Token();
+token.verify();
 
 App.mpType = 'app'	
 
