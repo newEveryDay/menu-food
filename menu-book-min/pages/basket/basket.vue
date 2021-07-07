@@ -119,7 +119,7 @@
 			// 编辑食材
 			editIngredientItem(type){
 				this.$refs.popup.open('top')
-			}
+			},
 			// 添加食谱
 			addIngredientItem(item,basketIndex) {
 				this.ingredient.foodname = ''
