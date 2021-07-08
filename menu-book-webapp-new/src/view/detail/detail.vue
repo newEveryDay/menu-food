@@ -8,23 +8,37 @@
 -->
 <template>
   <div class="wrapper">
-    <!-- 轮播开始 -->
-    <van-swipe class="my-swipe" :autoplay="3000">
-      <van-swipe-item v-for="(image, index) in images" :key="index">
-        <img class="img" v-lazy="image" />
-      </van-swipe-item>
-    </van-swipe>
-    <!-- 轮播结束 -->
-    <div class="quick-enter">
-      <van-grid :gutter="10" :border="false" :square="true">
-        <van-grid-item
-          v-for="(cate,key) in  cateSection"
-          :key="key"
-          :icon="cate.icon"
-          :text="cate.name"
-        />
-      </van-grid>
-    </div>
+    <header>
+      <van-nav-bar title="菜谱之家" fixed />
+    </header>
+    <section>
+      <!-- 轮播开始 -->
+      <van-swipe class="my-swipe" :autoplay="3000">
+        <van-swipe-item v-for="(image, index) in images" :key="index">
+          <img class="img" v-lazy="image" />
+        </van-swipe-item>
+      </van-swipe>
+      <!-- 轮播结束 -->
+      <div class="quick-enter">
+        <van-grid :gutter="10" :border="false" :square="true">
+          <van-grid-item
+            v-for="(cate,key) in  cateSection"
+            :key="key"
+            :icon="cate.icon"
+            :text="cate.name"
+          />
+        </van-grid>
+      </div>
+    </section>
+
+    <footer>
+      <van-tabbar v-model="active">
+        <van-tabbar-item icon="home-o" to="/home">首页</van-tabbar-item>
+        <van-tabbar-item icon="search" dot to="/menu">菜谱</van-tabbar-item>
+        <van-tabbar-item icon="friends-o" badge="5" to="/collect">收藏</van-tabbar-item>
+        <van-tabbar-item icon="setting-o" badge="20" to="/user">我的</van-tabbar-item>
+      </van-tabbar>
+    </footer>
   </div>
 </template>
 
@@ -94,6 +108,25 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang='less'>
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+}
+header,
+footer {
+  height: 46px;
+  line-height: 46px;
+  background-color: #d8d8d8;
+  text-align: center;
+}
+section {
+  flex: 1;
+  width: 100%;
+  overflow: auto; /* winphone8和android4+ */
+  -webkit-overflow-scrolling: touch; /* ios5+ */
+}
 .my-swipe .van-swipe-item {
   color: #fff;
   font-size: 20px;

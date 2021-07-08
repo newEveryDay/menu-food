@@ -1,7 +1,0 @@
-{
-  "enablePullDownRefresh": true,
-  "navigationBarTitleText": "收藏",
-  "usingComponents": {
-    "uni-number-box": "/components/uni-number-box"
-  }
-}
